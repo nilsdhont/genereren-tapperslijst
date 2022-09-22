@@ -1,4 +1,11 @@
-public class Tapper {
+package be.brigandze;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class Tapper implements Comparable<Tapper>{
 
     private String naam;
     private Ploeg ploeg;
@@ -54,11 +61,48 @@ public class Tapper {
 
     @Override
     public String toString() {
-        return "Tapper{" +
+        return "be.brigandze.Tapper{" +
             "naam='" + naam + '\'' +
             ", ploeg=" + ploeg +
             ", aantalMatchen=" + aantalMatchen +
             ", aantalTrainingen=" + aantalTrainingen +
             '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Tapper tapper = (Tapper) o;
+        return naam.equals(tapper.naam);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(naam);
+    }
+
+    public String[] createCVSLine(List<Shift> listForTapper) {
+        List<String> list = new ArrayList<>();
+        list.add(naam);
+        list.add(String.valueOf(aantalMatchen));
+        list.add(String.valueOf(aantalTrainingen));
+        listForTapper.forEach(shift -> {
+            StringBuilder s = new StringBuilder();
+            s.append(shift.startDateTime().getDayOfWeek());
+            s.append(" ");
+            s.append(shift.startDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            s.append(" ");
+            s.append(shift.beschrijving());
+            list.add(s.toString());
+        });
+        return list.toArray(new String[0]);
+    }
+
+    @Override
+    public int compareTo(Tapper t) {
+        return this.naam.compareTo(t.naam);
     }
 }

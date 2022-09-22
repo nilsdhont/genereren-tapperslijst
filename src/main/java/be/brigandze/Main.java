@@ -1,4 +1,16 @@
+package be.brigandze;
+
+import com.opencsv.CSVWriter;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,7 +20,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -16,58 +27,108 @@ public class Main {
     private static List<Tapper> tappers;
     private static Map<LocalDate, Ploeg> matchen;
 
+    private static LocalDate startWinterStop = LocalDate.of(2022, 12, 25);
+    private static LocalDate endWinterStop = LocalDate.of(2023, 1, 8);
+
     public static void main(String[] args) {
 
         vulLedenLijst();
-        System.out.println("Aantal tappers: " + tappers.size());
         vulMatchen();
-        System.out.println("Aantal matchen: " + matchen.size());
+        //        System.out.println("Aantal tappers: " + tappers.size());
+        //        System.out.println("Aantal matchen: " + matchen.size());
 
-        LocalDate startDate = LocalDate.of(2022, 9, 26);
+        LocalDate startDate = LocalDate.of(2022, 9, 24);
         LocalDate endDate = LocalDate.of(2023, 5, 28);
 
         startDate.datesUntil(endDate.plusDays(1)).forEach(date -> createShiftIfNeeded(date));
 
-        shiften.stream().forEach(System.out::println);
+        //        shiften.stream().forEach(System.out::println);
+        //        tappers.stream().forEach(System.out::println);
+        writeShiftenToCSV();
+        writePerTapperToCSV();
     }
 
     private static void createShiftIfNeeded(LocalDate date) {
         Collections.shuffle(tappers); // for some randomness
+
+        if (date.isAfter(startWinterStop) && date.isBefore(endWinterStop)) {
+            return; // No shifts during winterstop
+        }
+
         switch (date.getDayOfWeek()) {
-            case MONDAY -> shiften.add(createShiftForPloeg(date, Ploeg.VROUWEN));
-            case TUESDAY -> shiften.add(createShiftForPloeg(date, Ploeg.MANNEN));
-            case THURSDAY -> shiften.add(createShiftForAllPloegen(date));
-            case SATURDAY, SUNDAY -> {
-                var match = dateHasHomeMatch(date);
-                if (match.isPresent()) {
-                    shiften.add(createMatchShift(date, match.get().getValue()));
-                }
+        case MONDAY -> shiften.add(createShiftForPloeg(date, Ploeg.VROUWEN));
+        case TUESDAY -> shiften.add(createShiftForPloeg(date, Ploeg.MANNEN));
+        case THURSDAY -> {
+            if (date.isBefore(LocalDate.of(2022, 10, 14))) {
+                shiften.add(createJeugdShift(date));
             }
-            case WEDNESDAY, FRIDAY -> {
+            shiften.add(createShiftForAllPloegen(date));
+        }
+        case SATURDAY, SUNDAY -> {
+            var match = dateHasHomeMatch(date);
+            if (match.isPresent()) {
+                shiften.add(createMatchShift(date, getOtherPloeg(match.get().getValue())));
             }
-            default -> throw new IllegalStateException("Unexpected value: " + date.getDayOfWeek());
+        }
+        case WEDNESDAY, FRIDAY -> {
+        }
+        default -> throw new IllegalStateException("Unexpected value: " + date.getDayOfWeek());
         }
 
     }
 
-    private static Shift createShiftForPloeg(LocalDate date, Ploeg ploeg) {
-        return new Shift(date.atTime(19, 30), date.getDayOfWeek(),
-            List.of(findTapperForShift(ploeg), findTapperForShift(ploeg)));
+    private static Ploeg getOtherPloeg(Ploeg ploeg) {
+        return ploeg.equals(Ploeg.VROUWEN) ? Ploeg.MANNEN : Ploeg.VROUWEN;
     }
 
+    private static Shift createShiftForPloeg(LocalDate date, Ploeg ploeg) {
+        return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
+            date.getDayOfWeek(),
+            List.of(findTapperForShift(ploeg), findTapperForShift(ploeg)),
+            "Training " + ploeg.toString().toLowerCase());
+    }
+
+    private static Shift createJeugdShift(LocalDate date) {
+        return new Shift(date.atTime(18, 0), LocalTime.of(19, 30),
+            date.getDayOfWeek(),
+            List.of(findTapperForShift(Ploeg.MANNEN), findTapperForShiftMatch(Ploeg.VROUWEN)),
+            "Training jeugd");
+    }
+
+    //TODO 1 man en 1 vrouw? of zorgen dat er per persoon evenveel shiften zijn?? ==> findTapperForShiftNoPloeg gebruiken dan.
     private static Shift createShiftForAllPloegen(LocalDate date) {
-        return new Shift(date.atTime(19, 30), date.getDayOfWeek(),
-            List.of(findTapperForShift(Ploeg.VROUWEN), findTapperForShift(Ploeg.MANNEN)));
+        return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
+            date.getDayOfWeek(),
+            List.of(findTapperForShift(Ploeg.VROUWEN), findTapperForShift(Ploeg.MANNEN)),
+            "Training " + Ploeg.MANNEN.toString().toLowerCase() + "/" + Ploeg.VROUWEN.toString().toLowerCase());
     }
 
     private static Shift createMatchShift(LocalDate date, Ploeg ploeg) {
-        return new Shift(date.atTime(13, 30), date.getDayOfWeek(),
+        return new Shift(date.atTime(13, 30), LocalTime.of(20, 00),
+            date.getDayOfWeek(),
             IntStream.range(0, 6)
                 .mapToObj(i -> findTapperForShiftMatch(ploeg))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()),
+            "Match " + getOtherPloeg(ploeg).toString().toLowerCase());
     }
 
-    private static Tapper findTapperForShift(Ploeg ploeg) { //TODO magic
+    private static Tapper findTapperForShift(Ploeg ploeg) {
+        int leastAmountOfShifts = tappers.stream()
+            .filter(t -> t.getPloeg().equals(ploeg))
+            .map(Tapper::getAantalTrainingen)
+            .mapToInt(i -> i)
+            .min()
+            .getAsInt();
+        Tapper tapper = tappers.stream()
+            .filter(t -> t.getAantalTrainingen() == leastAmountOfShifts)
+            .filter(t -> t.getPloeg().equals(ploeg))
+            .findAny()
+            .get();
+        tapper.addTraining();
+        return tapper;
+    }
+
+    private static Tapper findTapperForShiftNoPloeg() {
         int leastAmountOfShifts = tappers.stream()
             .map(Tapper::getAantalTrainingen)
             .mapToInt(i -> i)
@@ -81,14 +142,16 @@ public class Main {
         return tapper;
     }
 
-    private static Tapper findTapperForShiftMatch(Ploeg ploeg) { //TODO magic
+    private static Tapper findTapperForShiftMatch(Ploeg ploeg) {
         int leastAmountOfShifts = tappers.stream()
+            .filter(t -> t.getPloeg().equals(ploeg))
             .map(tapper -> tapper.getAantalMatchen())
             .mapToInt(i -> i)
             .min()
             .getAsInt();
         Tapper tapper = tappers.stream()
             .filter(t -> t.getAantalMatchen() == leastAmountOfShifts)
+            .filter(t -> t.getPloeg().equals(ploeg))
             .findAny()
             .get();
         tapper.addMatch();
@@ -100,6 +163,41 @@ public class Main {
             .findFirst();
     }
 
+    private static void writeShiftenToCSV() {
+        List<String[]> lines = shiften.stream()
+            .map(Shift::toArray)
+            .collect(Collectors.toList());
+        try {
+            Path path = Paths.get(ClassLoader.getSystemResource("tappers.csv").toURI());
+            try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString()))) {
+                lines.forEach(writer::writeNext);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writePerTapperToCSV() {
+        List<String[]> tapperLines = new ArrayList<>();
+        tappers.stream().sorted().forEach(tapper -> {
+            List<Shift> listForTapper = shiften.stream()
+                .filter(shift -> shift.tappers().contains(tapper))
+                .collect(Collectors.toList());
+            tapperLines.add(tapper.createCVSLine(listForTapper));
+        });
+        try {
+            Path path = Paths.get(ClassLoader.getSystemResource("perPersoon.csv").toURI());
+            try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString()))) {
+                tapperLines.forEach(writer::writeNext);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static void vulLedenLijst() {
         tappers = new ArrayList<>();
@@ -113,6 +211,7 @@ public class Main {
         tappers.add(new Tapper("De Beir Jasmine", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("De Bondt Silke", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("De Brabander Jana", Ploeg.VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Brabander Jitske", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("De Cock Lyana", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("De Decker Damiet", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("De Graef Kim", Ploeg.VROUWEN, 0, 0));
@@ -135,6 +234,7 @@ public class Main {
         tappers.add(new Tapper("Veyt Lieve", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("Veyt Nele", Ploeg.VROUWEN, 0, 0));
         tappers.add(new Tapper("Withofs Valerie", Ploeg.VROUWEN, 0, 0));
+
         tappers.add(new Tapper("Boone Sven", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("Callebaut Anton", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("Celi Jarne", Ploeg.MANNEN, 0, 0));
@@ -144,7 +244,6 @@ public class Main {
         tappers.add(new Tapper("D'hont Nils", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Bie Hans", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Bruyne Lieven", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Clerck Stefan", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Coster Bram", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Cuyper Sam", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Graeve Yenthel", Ploeg.MANNEN, 0, 0));
@@ -153,9 +252,7 @@ public class Main {
         tappers.add(new Tapper("De Saedelaere Simon", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Troyer Lucas", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("De Vreese Jacob", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Devits Mats", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("Everaert Frederik", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Fory Yoran", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("Govaert Arno", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("Heirman Kristof", Ploeg.MANNEN, 0, 0));
         tappers.add(new Tapper("Huygens Jeroen", Ploeg.MANNEN, 0, 0));
@@ -194,6 +291,7 @@ public class Main {
         matchen.put(LocalDate.of(2023, 3, 26), Ploeg.MANNEN);
         matchen.put(LocalDate.of(2023, 4, 23), Ploeg.MANNEN);
 
+        //        matchen.put(LocalDate.of(2022, 9, 24), Ploeg.VROUWEN);
         matchen.put(LocalDate.of(2022, 10, 8), Ploeg.VROUWEN);
         matchen.put(LocalDate.of(2022, 11, 5), Ploeg.VROUWEN);
         matchen.put(LocalDate.of(2022, 11, 12), Ploeg.VROUWEN);
