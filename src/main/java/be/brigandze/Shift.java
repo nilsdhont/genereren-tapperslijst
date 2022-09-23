@@ -31,8 +31,8 @@ public record Shift(LocalDateTime startDateTime, LocalTime endTime, DayOfWeek da
         tempList.add(startDateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         tempList.add(beschrijving);
         tempList.add(vertaalDayOfWeek(startDateTime.getDayOfWeek()));
-        tempList.add(startDateTime.getHour() + "." + startDateTime.getMinute() + " - " +
-            endTime.getHour() + "." + endTime.getMinute() + " u");
+
+        tempList.add(startDateTime.format(DateTimeFormatter.ofPattern("HH.mm")) + " - " + endTime.format(DateTimeFormatter.ofPattern("HH.mm")));
         tappers.forEach(tapper -> tempList.add(tapper.getNaam()));
         return tempList.toArray(new String[0]);
     }

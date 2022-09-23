@@ -1,7 +1,6 @@
 package be.brigandze;
 
 import com.opencsv.CSVWriter;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +18,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static be.brigandze.Ploeg.MANNEN;
+import static be.brigandze.Ploeg.VROUWEN;
+import static java.util.stream.Collectors.toList;
 
 public class Main {
 
@@ -29,6 +32,9 @@ public class Main {
 
     private static LocalDate startWinterStop = LocalDate.of(2022, 12, 25);
     private static LocalDate endWinterStop = LocalDate.of(2023, 1, 8);
+    private static LocalDate tapCursus = LocalDate.of(2022, 10, 14);
+
+    private static LocalDate firstDateZaterdagJeugdShiftTweeWekelijks = LocalDate.of(2022, 9, 24); //Fiel
 
     public static void main(String[] args) {
 
@@ -37,7 +43,7 @@ public class Main {
         //        System.out.println("Aantal tappers: " + tappers.size());
         //        System.out.println("Aantal matchen: " + matchen.size());
 
-        LocalDate startDate = LocalDate.of(2022, 9, 24);
+        LocalDate startDate = LocalDate.of(2022, 9, 26);
         LocalDate endDate = LocalDate.of(2023, 5, 28);
 
         startDate.datesUntil(endDate.plusDays(1)).forEach(date -> createShiftIfNeeded(date));
@@ -56,102 +62,168 @@ public class Main {
         }
 
         switch (date.getDayOfWeek()) {
-        case MONDAY -> shiften.add(createShiftForPloeg(date, Ploeg.VROUWEN));
-        case TUESDAY -> shiften.add(createShiftForPloeg(date, Ploeg.MANNEN));
+        case MONDAY -> shiften.add(createShiftForTraining(date, VROUWEN)); // Training vrouwen
+        case TUESDAY -> {
+            if (date.isBefore(tapCursus)) { // Jeugd Dinsdag. Tot tapcursus leden, daarna op de te vullen door ouders
+                shiften.add(createJeugdShiftWeekdag(date, true));
+            } else {
+                shiften.add(createJeugdShiftWeekdag(date, false));
+            }
+            shiften.add(createShiftForTraining(date, MANNEN)); // Training mannen
+        }
         case THURSDAY -> {
-            if (date.isBefore(LocalDate.of(2022, 10, 14))) {
-                shiften.add(createJeugdShift(date));
+            if (date.isBefore(tapCursus)) { // Jeugd Donderdag. Tot tapcursus leden, daarna op de te vullen door ouders
+                shiften.add(createJeugdShiftWeekdag(date, true));
+            } else {
+                shiften.add(createJeugdShiftWeekdag(date, false));
             }
-            shiften.add(createShiftForAllPloegen(date));
+            shiften.add(createShiftForTraining(date)); //Training mannen/vrouwen
         }
-        case SATURDAY, SUNDAY -> {
-            var match = dateHasHomeMatch(date);
-            if (match.isPresent()) {
-                shiften.add(createMatchShift(date, getOtherPloeg(match.get().getValue())));
+        case SATURDAY -> {
+            if (date.isBefore(tapCursus)) { // Jeugd Donderdag. Tot tapcursus leden, daarna op de te vullen door ouders
+                shiften.add(createJeugdShiftZaterdag(date));
+            } else {
+                shiften.add(createJeugdShiftZaterdag(date));
             }
+            createMatchShift(date); // Vrouwen matchen
         }
-        case WEDNESDAY, FRIDAY -> {
-        }
-        default -> throw new IllegalStateException("Unexpected value: " + date.getDayOfWeek());
+        case SUNDAY -> createMatchShift(date); // Mannen matchen
+        case WEDNESDAY, FRIDAY -> {} // Niks op woensdag. Vrijdag doet touch zelf zijn toog. kunnen evt placeholders voor gemaakt worden?
         }
 
+    }
+
+    private static void createMatchShift(LocalDate date) {
+        var match = dateHasHomeMatch(date);
+        if (match.isPresent()) {
+            shiften.add(createMatchShift(date, getOtherPloeg(match.get().getValue())));
+        }
     }
 
     private static Ploeg getOtherPloeg(Ploeg ploeg) {
-        return ploeg.equals(Ploeg.VROUWEN) ? Ploeg.MANNEN : Ploeg.VROUWEN;
+        return ploeg.equals(VROUWEN) ? MANNEN : VROUWEN;
     }
 
-    private static Shift createShiftForPloeg(LocalDate date, Ploeg ploeg) {
+    private static Shift createShiftForTraining(LocalDate date, Ploeg ploeg) {
         return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
             date.getDayOfWeek(),
-            List.of(findTapperForShift(ploeg), findTapperForShift(ploeg)),
+            List.of(findTapperForTraining(ploeg), findTapperForTraining(ploeg)),
             "Training " + ploeg.toString().toLowerCase());
     }
 
-    private static Shift createJeugdShift(LocalDate date) {
+    private static Shift createJeugdShiftWeekdag(LocalDate date, boolean tappers) {
         return new Shift(date.atTime(18, 0), LocalTime.of(19, 30),
             date.getDayOfWeek(),
-            List.of(findTapperForShift(Ploeg.MANNEN), findTapperForShiftMatch(Ploeg.VROUWEN)),
+            tappers ? List.of(findTapperForTraining(MANNEN), findTapperForTraining(VROUWEN)) : List.of(),
             "Training jeugd");
     }
 
-    //TODO 1 man en 1 vrouw? of zorgen dat er per persoon evenveel shiften zijn?? ==> findTapperForShiftNoPloeg gebruiken dan.
-    private static Shift createShiftForAllPloegen(LocalDate date) {
+    private static Shift createJeugdShiftZaterdag(LocalDate date) {
+        return new Shift(date.atTime(9, 45), LocalTime.of(12, 30),
+            date.getDayOfWeek(),
+            List.of(findTapperForTraining(), findTapperForTraining()),
+            "Training jeugd");
+    }
+
+    //TODO 1 man en 1 vrouw? of zorgen dat er per persoon evenveel shiften zijn?? ==> findTapperForTraining() gebruiken dan.
+    private static Shift createShiftForTraining(LocalDate date) {
         return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
             date.getDayOfWeek(),
-            List.of(findTapperForShift(Ploeg.VROUWEN), findTapperForShift(Ploeg.MANNEN)),
-            "Training " + Ploeg.MANNEN.toString().toLowerCase() + "/" + Ploeg.VROUWEN.toString().toLowerCase());
+            List.of(findTapperForTraining(), findTapperForTraining()),
+            "Training " + MANNEN.toString().toLowerCase() + "/" + VROUWEN.toString().toLowerCase());
     }
 
     private static Shift createMatchShift(LocalDate date, Ploeg ploeg) {
         return new Shift(date.atTime(13, 30), LocalTime.of(20, 00),
             date.getDayOfWeek(),
             IntStream.range(0, 6)
-                .mapToObj(i -> findTapperForShiftMatch(ploeg))
-                .collect(Collectors.toList()),
+                .mapToObj(i -> findTapperForMatch(ploeg))
+                .collect(toList()),
             "Match " + getOtherPloeg(ploeg).toString().toLowerCase());
     }
 
-    private static Tapper findTapperForShift(Ploeg ploeg) {
-        int leastAmountOfShifts = tappers.stream()
+    private static Tapper findTapperForTraining(Ploeg ploeg) {
+        int leastAmountOfTrainingen = tappers.stream()
             .filter(t -> t.getPloeg().equals(ploeg))
             .map(Tapper::getAantalTrainingen)
             .mapToInt(i -> i)
             .min()
             .getAsInt();
-        Tapper tapper = tappers.stream()
-            .filter(t -> t.getAantalTrainingen() == leastAmountOfShifts)
+        List<Tapper> candidates = tappers.stream()
+            .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
             .filter(t -> t.getPloeg().equals(ploeg))
+            .collect(toList());
+        int leastAmountOfMatchen = candidates.stream()
+            .map(Tapper::getAantalMatchen)
+            .mapToInt(i->i)
+            .min()
+            .getAsInt();
+        Tapper tapper = candidates.stream()
+            .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
             .findAny()
             .get();
         tapper.addTraining();
         return tapper;
     }
 
-    private static Tapper findTapperForShiftNoPloeg() {
-        int leastAmountOfShifts = tappers.stream()
+    private static Tapper findTapperForTraining() {
+        int leastAmountOfTrainingen = tappers.stream()
             .map(Tapper::getAantalTrainingen)
             .mapToInt(i -> i)
             .min()
             .getAsInt();
-        Tapper tapper = tappers.stream()
-            .filter(t -> t.getAantalTrainingen() == leastAmountOfShifts)
+        List<Tapper> candidates = tappers.stream()
+            .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+            .collect(toList());
+        int leastAmountOfMatchen = candidates.stream()
+            .map(Tapper::getAantalMatchen)
+            .mapToInt(i->i)
+            .min()
+            .getAsInt();
+
+        Tapper tapper = candidates.stream()
+            .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
             .findAny()
             .get();
         tapper.addTraining();
         return tapper;
     }
 
-    private static Tapper findTapperForShiftMatch(Ploeg ploeg) {
-        int leastAmountOfShifts = tappers.stream()
+//    private static Tapper findTapperForMatch(Ploeg ploeg) {
+//        int leastAmountOfShifts = tappers.stream()
+//            .filter(t -> t.getPloeg().equals(ploeg))
+//            .map(Tapper::getAantalMatchen)
+//            .mapToInt(i -> i)
+//            .min()
+//            .getAsInt();
+//        Tapper tapper = tappers.stream()
+//            .filter(t -> t.getAantalMatchen() == leastAmountOfShifts)
+//            .filter(t -> t.getPloeg().equals(ploeg))
+//            .findAny()
+//            .get();
+//        tapper.addMatch();
+//        return tapper;
+//    }
+
+    private static Tapper findTapperForMatch(Ploeg ploeg) {
+        int leastAmountOfMatchen = tappers.stream()
             .filter(t -> t.getPloeg().equals(ploeg))
-            .map(tapper -> tapper.getAantalMatchen())
+            .map(Tapper::getAantalMatchen)
             .mapToInt(i -> i)
             .min()
             .getAsInt();
-        Tapper tapper = tappers.stream()
-            .filter(t -> t.getAantalMatchen() == leastAmountOfShifts)
+        List<Tapper> candidates = tappers.stream()
+            .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
             .filter(t -> t.getPloeg().equals(ploeg))
+            .collect(toList());
+        int leastAmountOfTrainingen = candidates.stream()
+            .map(Tapper::getAantalTrainingen)
+            .mapToInt(i->i)
+            .min()
+            .getAsInt();
+        Collections.shuffle(candidates);
+        Tapper tapper = candidates.stream()
+            .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
             .findAny()
             .get();
         tapper.addMatch();
@@ -166,7 +238,7 @@ public class Main {
     private static void writeShiftenToCSV() {
         List<String[]> lines = shiften.stream()
             .map(Shift::toArray)
-            .collect(Collectors.toList());
+            .collect(toList());
         try {
             Path path = Paths.get(ClassLoader.getSystemResource("tappers.csv").toURI());
             try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString()))) {
@@ -184,7 +256,7 @@ public class Main {
         tappers.stream().sorted().forEach(tapper -> {
             List<Shift> listForTapper = shiften.stream()
                 .filter(shift -> shift.tappers().contains(tapper))
-                .collect(Collectors.toList());
+                .collect(toList());
             tapperLines.add(tapper.createCVSLine(listForTapper));
         });
         try {
@@ -201,104 +273,104 @@ public class Main {
 
     private static void vulLedenLijst() {
         tappers = new ArrayList<>();
-        tappers.add(new Tapper("Anthuenis Els", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Baetens Elien", Ploeg.VROUWEN, 1, 0));
-        tappers.add(new Tapper("Bosman Kaat", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Bosman Lieselotte", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Buyle Hannelore", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Cooreman Ludiwien", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Dauwe Irjen", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Beir Jasmine", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Bondt Silke", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Brabander Jana", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Brabander Jitske", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Cock Lyana", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Decker Damiet", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Graef Kim", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Troyer Katrijn", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Vuyst Lynn", Ploeg.VROUWEN, 1, 0));
-        tappers.add(new Tapper("Dewitte Daphné", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Dierickx Evelyne", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Duerinck Manon", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Dumez Charlotte", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Haentjes Lisa", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Moerman Britt", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Reper Charo", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Scholliers Jana", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Thibau Anke", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Van Driessche Ashley", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Van Driessche Irmgard", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Van Malderen Emma", Ploeg.VROUWEN, 1, 0));
-        tappers.add(new Tapper("Van Puyvelde Anke", Ploeg.VROUWEN, 1, 0));
-        tappers.add(new Tapper("Van Zande Ilona", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Veyt Lieve", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Veyt Nele", Ploeg.VROUWEN, 0, 0));
-        tappers.add(new Tapper("Withofs Valerie", Ploeg.VROUWEN, 0, 0));
+        tappers.add(new Tapper("Anthuenis Els", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Baetens Elien", VROUWEN, 1, 0));
+        tappers.add(new Tapper("Bosman Kaat", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Bosman Lieselotte", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Buyle Hannelore", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Cooreman Ludiwien", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Dauwe Irjen", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Beir Jasmine", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Bondt Silke", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Brabander Jana", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Brabander Jitske", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Cock Lyana", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Decker Damiet", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Graef Kim", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Troyer Katrijn", VROUWEN, 0, 0));
+        tappers.add(new Tapper("De Vuyst Lynn", VROUWEN, 1, 0));
+        tappers.add(new Tapper("Dewitte Daphné", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Dierickx Evelyne", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Duerinck Manon", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Dumez Charlotte", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Haentjes Lisa", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Moerman Britt", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Reper Charo", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Scholliers Jana", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Thibau Anke", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Van Driessche Ashley", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Van Driessche Irmgard", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, 1, 0));
+        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, 1, 0));
+        tappers.add(new Tapper("Van Zande Ilona", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Veyt Lieve", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Veyt Nele", VROUWEN, 0, 0));
+        tappers.add(new Tapper("Withofs Valerie", VROUWEN, 0, 0));
 
-        tappers.add(new Tapper("Boone Sven", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Callebaut Anton", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Celi Jarne", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Christiaens Wout", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Criel Dajo", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("D'hont Kjell", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("D'hont Nils", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Bie Hans", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Bruyne Lieven", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Coster Bram", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Cuyper Sam", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Graeve Yenthel", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Groot Timothy", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Maesschalck Bram", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Saedelaere Simon", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Troyer Lucas", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("De Vreese Jacob", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Everaert Frederik", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Govaert Arno", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Heirman Kristof", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Huygens Jeroen", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Kerre Davy", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Klein Joni", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Lanckbeen Tom", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Matthijs Piet", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Moerman Geert", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Pieters Jonathan", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Raemdonck Preben", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Rijckbosch Ebbe", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Roelandt Tom", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Rottiers Sam", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Scrivens Jason", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Spriet Juul", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Thibau Davy", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Van De Voorde Filip", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Van Hauwermeiren Koen", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Ben", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Stef", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Vermeir Aaron", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Vermonden Joeri", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Waegeman Yorick", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Withofs Wouter", Ploeg.MANNEN, 0, 0));
-        tappers.add(new Tapper("Zaman Alexander", Ploeg.MANNEN, 0, 0));
+        tappers.add(new Tapper("Boone Sven", MANNEN, 0, 0));
+        tappers.add(new Tapper("Callebaut Anton", MANNEN, 0, 0));
+        tappers.add(new Tapper("Celi Jarne", MANNEN, 0, 0));
+        tappers.add(new Tapper("Christiaens Wout", MANNEN, 0, 0));
+        tappers.add(new Tapper("Criel Dajo", MANNEN, 0, 0));
+        tappers.add(new Tapper("D'hont Kjell", MANNEN, 0, 0));
+        tappers.add(new Tapper("D'hont Nils", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Bie Hans", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Bruyne Lieven", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Coster Bram", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Cuyper Sam", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Graeve Yenthel", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Groot Timothy", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Maesschalck Bram", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Saedelaere Simon", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Troyer Lucas", MANNEN, 0, 0));
+        tappers.add(new Tapper("De Vreese Jacob", MANNEN, 0, 0));
+        tappers.add(new Tapper("Everaert Frederik", MANNEN, 0, 0));
+        tappers.add(new Tapper("Govaert Arno", MANNEN, 0, 0));
+        tappers.add(new Tapper("Heirman Kristof", MANNEN, 0, 0));
+        tappers.add(new Tapper("Huygens Jeroen", MANNEN, 0, 0));
+        tappers.add(new Tapper("Kerre Davy", MANNEN, 0, 0));
+        tappers.add(new Tapper("Klein Joni", MANNEN, 0, 0));
+        tappers.add(new Tapper("Lanckbeen Tom", MANNEN, 0, 0));
+        tappers.add(new Tapper("Matthijs Piet", MANNEN, 0, 0));
+        tappers.add(new Tapper("Moerman Geert", MANNEN, 0, 0));
+        tappers.add(new Tapper("Pieters Jonathan", MANNEN, 0, 0));
+        tappers.add(new Tapper("Raemdonck Preben", MANNEN, 0, 0));
+        tappers.add(new Tapper("Rijckbosch Ebbe", MANNEN, 0, 0));
+        tappers.add(new Tapper("Roelandt Tom", MANNEN, 0, 0));
+        tappers.add(new Tapper("Rottiers Sam", MANNEN, 0, 0));
+        tappers.add(new Tapper("Scrivens Jason", MANNEN, 0, 0));
+        tappers.add(new Tapper("Spriet Juul", MANNEN, 0, 0));
+        tappers.add(new Tapper("Thibau Davy", MANNEN, 0, 0));
+        tappers.add(new Tapper("Van De Voorde Filip", MANNEN, 0, 0));
+        tappers.add(new Tapper("Van Hauwermeiren Koen", MANNEN, 0, 0));
+        tappers.add(new Tapper("Van Puyvelde Ben", MANNEN, 0, 0));
+        tappers.add(new Tapper("Van Puyvelde Stef", MANNEN, 0, 0));
+        tappers.add(new Tapper("Vermeir Aaron", MANNEN, 0, 0));
+        tappers.add(new Tapper("Vermonden Joeri", MANNEN, 0, 0));
+        tappers.add(new Tapper("Waegeman Yorick", MANNEN, 0, 0));
+        tappers.add(new Tapper("Withofs Wouter", MANNEN, 0, 0));
+        tappers.add(new Tapper("Zaman Alexander", MANNEN, 0, 0));
         Collections.shuffle(tappers);
     }
 
     private static void vulMatchen() {
         matchen = new HashMap<>();
-        matchen.put(LocalDate.of(2022, 11, 2), Ploeg.MANNEN);
-        matchen.put(LocalDate.of(2022, 11, 27), Ploeg.MANNEN);
-        matchen.put(LocalDate.of(2023, 1, 29), Ploeg.MANNEN);
-        matchen.put(LocalDate.of(2023, 2, 12), Ploeg.MANNEN);
-        matchen.put(LocalDate.of(2023, 3, 12), Ploeg.MANNEN);
-        matchen.put(LocalDate.of(2023, 3, 26), Ploeg.MANNEN);
-        matchen.put(LocalDate.of(2023, 4, 23), Ploeg.MANNEN);
+        matchen.put(LocalDate.of(2022, 11, 2), MANNEN);
+        matchen.put(LocalDate.of(2022, 11, 27), MANNEN);
+        matchen.put(LocalDate.of(2023, 1, 29), MANNEN);
+        matchen.put(LocalDate.of(2023, 2, 12), MANNEN);
+        matchen.put(LocalDate.of(2023, 3, 12), MANNEN);
+        matchen.put(LocalDate.of(2023, 3, 26), MANNEN);
+        matchen.put(LocalDate.of(2023, 4, 23), MANNEN);
 
         //        matchen.put(LocalDate.of(2022, 9, 24), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2022, 10, 8), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2022, 11, 5), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2022, 11, 12), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2022, 12, 3), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2023, 1, 21), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2023, 2, 4), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2023, 3, 11), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2023, 4, 8), Ploeg.VROUWEN);
+        matchen.put(LocalDate.of(2022, 10, 8), VROUWEN);
+        matchen.put(LocalDate.of(2022, 11, 5), VROUWEN);
+        matchen.put(LocalDate.of(2022, 11, 12), VROUWEN);
+        matchen.put(LocalDate.of(2022, 12, 3), VROUWEN);
+        matchen.put(LocalDate.of(2023, 1, 21), VROUWEN);
+        matchen.put(LocalDate.of(2023, 2, 4), VROUWEN);
+        matchen.put(LocalDate.of(2023, 3, 11), VROUWEN);
+        matchen.put(LocalDate.of(2023, 4, 8), VROUWEN);
     }
 }

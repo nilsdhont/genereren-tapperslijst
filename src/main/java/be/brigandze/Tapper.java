@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static be.brigandze.Shift.vertaalDayOfWeek;
+
 public class Tapper implements Comparable<Tapper>{
 
     private String naam;
@@ -91,7 +93,7 @@ public class Tapper implements Comparable<Tapper>{
         list.add(String.valueOf(aantalTrainingen));
         listForTapper.forEach(shift -> {
             StringBuilder s = new StringBuilder();
-            s.append(shift.startDateTime().getDayOfWeek());
+            s.append(vertaalDayOfWeek(shift.startDateTime().getDayOfWeek()));
             s.append(" ");
             s.append(shift.startDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
             s.append(" ");
