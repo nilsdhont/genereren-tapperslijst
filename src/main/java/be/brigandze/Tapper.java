@@ -11,12 +11,15 @@ public class Tapper implements Comparable<Tapper>{
 
     private String naam;
     private Ploeg ploeg;
+
+    private boolean isTrainer;
     private int aantalMatchen;
     private int aantalTrainingen;
 
-    public Tapper(String naam, Ploeg ploeg, int aantalMatchen, int aantalTrainingen) {
+    public Tapper(String naam, Ploeg ploeg, boolean isTrainer, int aantalMatchen, int aantalTrainingen) {
         this.naam = naam;
         this.ploeg = ploeg;
+        this.isTrainer = isTrainer;
         this.aantalMatchen = aantalMatchen;
         this.aantalTrainingen = aantalTrainingen;
     }

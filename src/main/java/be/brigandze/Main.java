@@ -125,7 +125,6 @@ public class Main {
             "Training jeugd");
     }
 
-    //TODO 1 man en 1 vrouw? of zorgen dat er per persoon evenveel shiften zijn?? ==> findTapperForTraining() gebruiken dan.
     private static Shift createShiftForTraining(LocalDate date) {
         return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
             date.getDayOfWeek(),
@@ -188,22 +187,6 @@ public class Main {
         tapper.addTraining();
         return tapper;
     }
-
-//    private static Tapper findTapperForMatch(Ploeg ploeg) {
-//        int leastAmountOfShifts = tappers.stream()
-//            .filter(t -> t.getPloeg().equals(ploeg))
-//            .map(Tapper::getAantalMatchen)
-//            .mapToInt(i -> i)
-//            .min()
-//            .getAsInt();
-//        Tapper tapper = tappers.stream()
-//            .filter(t -> t.getAantalMatchen() == leastAmountOfShifts)
-//            .filter(t -> t.getPloeg().equals(ploeg))
-//            .findAny()
-//            .get();
-//        tapper.addMatch();
-//        return tapper;
-//    }
 
     private static Tapper findTapperForMatch(Ploeg ploeg) {
         int leastAmountOfMatchen = tappers.stream()
@@ -273,83 +256,83 @@ public class Main {
 
     private static void vulLedenLijst() {
         tappers = new ArrayList<>();
-        tappers.add(new Tapper("Anthuenis Els", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Baetens Elien", VROUWEN, 1, 0));
-        tappers.add(new Tapper("Bosman Kaat", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Bosman Lieselotte", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Buyle Hannelore", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Cooreman Ludiwien", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Dauwe Irjen", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Beir Jasmine", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Bondt Silke", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Brabander Jana", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Brabander Jitske", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Cock Lyana", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Decker Damiet", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Graef Kim", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Troyer Katrijn", VROUWEN, 0, 0));
-        tappers.add(new Tapper("De Vuyst Lynn", VROUWEN, 1, 0));
-        tappers.add(new Tapper("Dewitte Daphné", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Dierickx Evelyne", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Duerinck Manon", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Dumez Charlotte", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Haentjes Lisa", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Moerman Britt", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Reper Charo", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Scholliers Jana", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Thibau Anke", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Van Driessche Ashley", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Van Driessche Irmgard", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, 1, 0));
-        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, 1, 0));
-        tappers.add(new Tapper("Van Zande Ilona", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Veyt Lieve", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Veyt Nele", VROUWEN, 0, 0));
-        tappers.add(new Tapper("Withofs Valerie", VROUWEN, 0, 0));
-
-        tappers.add(new Tapper("Boone Sven", MANNEN, 0, 0));
-        tappers.add(new Tapper("Callebaut Anton", MANNEN, 0, 0));
-        tappers.add(new Tapper("Celi Jarne", MANNEN, 0, 0));
-        tappers.add(new Tapper("Christiaens Wout", MANNEN, 0, 0));
-        tappers.add(new Tapper("Criel Dajo", MANNEN, 0, 0));
-        tappers.add(new Tapper("D'hont Kjell", MANNEN, 0, 0));
-        tappers.add(new Tapper("D'hont Nils", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Bie Hans", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Bruyne Lieven", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Coster Bram", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Cuyper Sam", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Graeve Yenthel", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Groot Timothy", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Maesschalck Bram", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Saedelaere Simon", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Troyer Lucas", MANNEN, 0, 0));
-        tappers.add(new Tapper("De Vreese Jacob", MANNEN, 0, 0));
-        tappers.add(new Tapper("Everaert Frederik", MANNEN, 0, 0));
-        tappers.add(new Tapper("Govaert Arno", MANNEN, 0, 0));
-        tappers.add(new Tapper("Heirman Kristof", MANNEN, 0, 0));
-        tappers.add(new Tapper("Huygens Jeroen", MANNEN, 0, 0));
-        tappers.add(new Tapper("Kerre Davy", MANNEN, 0, 0));
-        tappers.add(new Tapper("Klein Joni", MANNEN, 0, 0));
-        tappers.add(new Tapper("Lanckbeen Tom", MANNEN, 0, 0));
-        tappers.add(new Tapper("Matthijs Piet", MANNEN, 0, 0));
-        tappers.add(new Tapper("Moerman Geert", MANNEN, 0, 0));
-        tappers.add(new Tapper("Pieters Jonathan", MANNEN, 0, 0));
-        tappers.add(new Tapper("Raemdonck Preben", MANNEN, 0, 0));
-        tappers.add(new Tapper("Rijckbosch Ebbe", MANNEN, 0, 0));
-        tappers.add(new Tapper("Roelandt Tom", MANNEN, 0, 0));
-        tappers.add(new Tapper("Rottiers Sam", MANNEN, 0, 0));
-        tappers.add(new Tapper("Scrivens Jason", MANNEN, 0, 0));
-        tappers.add(new Tapper("Spriet Juul", MANNEN, 0, 0));
-        tappers.add(new Tapper("Thibau Davy", MANNEN, 0, 0));
-        tappers.add(new Tapper("Van De Voorde Filip", MANNEN, 0, 0));
-        tappers.add(new Tapper("Van Hauwermeiren Koen", MANNEN, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Ben", MANNEN, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Stef", MANNEN, 0, 0));
-        tappers.add(new Tapper("Vermeir Aaron", MANNEN, 0, 0));
-        tappers.add(new Tapper("Vermonden Joeri", MANNEN, 0, 0));
-        tappers.add(new Tapper("Waegeman Yorick", MANNEN, 0, 0));
-        tappers.add(new Tapper("Withofs Wouter", MANNEN, 0, 0));
-        tappers.add(new Tapper("Zaman Alexander", MANNEN, 0, 0));
+        tappers.add(new Tapper("Anthuenis Els", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Baetens Elien", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("Bosman Kaat", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Bosman Lieselotte", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Buyle Hannelore", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Cooreman Ludiwien", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Dauwe Irjen", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Beir Jasmine", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Bondt Silke", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Brabander Jana", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Brabander Jitske", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Cock Lyana", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Decker Damiet", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Graef Kim", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Troyer Katrijn", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("De Vuyst Lynn", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("Dewitte Daphné", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Dierickx Evelyne", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Duerinck Manon", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Dumez Charlotte", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Haentjes Lisa", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Moerman Britt", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Reper Charo", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Scholliers Jana", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Thibau Anke", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Van Driessche Ashley", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Van Driessche Irmgard", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("Van Zande Ilona", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Veyt Lieve", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Veyt Nele", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Withofs Valerie", VROUWEN, false, 0, 0));
+        //Mannen
+        tappers.add(new Tapper("Boone Sven", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Callebaut Anton", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Celi Jarne", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Christiaens Wout", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Criel Dajo", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("D'hont Kjell", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("D'hont Nils", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Bie Hans", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Bruyne Lieven", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Coster Bram", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Cuyper Sam", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Graeve Yenthel", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Groot Timothy", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Maesschalck Bram", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Saedelaere Simon", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Troyer Lucas", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("De Vreese Jacob", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Everaert Frederik", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Govaert Arno", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Heirman Kristof", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Huygens Jeroen", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Kerre Davy", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Klein Joni", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Lanckbeen Tom", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Matthijs Piet", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Moerman Geert", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Pieters Jonathan", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Raemdonck Preben", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Rijckbosch Ebbe", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Roelandt Tom", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Rottiers Sam", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Scrivens Jason", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Spriet Juul", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Thibau Davy", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Van De Voorde Filip", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Van Hauwermeiren Koen", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Van Puyvelde Ben", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Van Puyvelde Stef", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Vermeir Aaron", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Vermonden Joeri", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Waegeman Yorick", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Withofs Wouter", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Zaman Alexander", MANNEN, false, 0, 0));
         Collections.shuffle(tappers);
     }
 

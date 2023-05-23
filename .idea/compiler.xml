@@ -9,8 +9,5 @@
         <module name="genereren-tapperslijst" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="genereren-tapperslijst" target="19" />
-    </bytecodeTargetLevel>
   </component>
 </project>
