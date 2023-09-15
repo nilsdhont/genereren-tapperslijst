@@ -20,8 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static be.brigandze.Ploeg.MANNEN;
-import static be.brigandze.Ploeg.VROUWEN;
+import static be.brigandze.Ploeg.*;
 import static java.util.stream.Collectors.toList;
 
 public class Main {
@@ -30,23 +29,24 @@ public class Main {
     private static List<Tapper> tappers;
     private static Map<LocalDate, Ploeg> matchen;
 
-    private static LocalDate startWinterStop = LocalDate.of(2022, 12, 25);
-    private static LocalDate endWinterStop = LocalDate.of(2023, 1, 8);
-    private static LocalDate tapCursus = LocalDate.of(2022, 10, 14);
+    //TODO Periodes voor schoolverloven
 
-    private static LocalDate firstDateZaterdagJeugdShiftTweeWekelijks = LocalDate.of(2022, 9, 24); //Fiel
+    private static LocalDate startSeizoen = LocalDate.of(2023, 9, 12);
+    private static LocalDate startWinterStop = LocalDate.of(2023, 12, 22);
+    private static LocalDate endWinterStop = LocalDate.of(2024, 1, 3);
+    private static LocalDate eindSeizoen = LocalDate.of(2024, 5, 19);
+
+//    private static LocalDate firstDateZaterdagJeugdShiftTweeWekelijks = LocalDate.of(2022, 9, 24);
 
     public static void main(String[] args) {
 
         vulLedenLijst();
         vulMatchen();
-        //        System.out.println("Aantal tappers: " + tappers.size());
-        //        System.out.println("Aantal matchen: " + matchen.size());
+        System.out.println("Aantal tappers: " + tappers.size());
+        System.out.println("Aantal matchen: " + matchen.size());
 
-        LocalDate startDate = LocalDate.of(2022, 9, 26);
-        LocalDate endDate = LocalDate.of(2023, 5, 28);
 
-        startDate.datesUntil(endDate.plusDays(1)).forEach(date -> createShiftIfNeeded(date));
+        startSeizoen.datesUntil(eindSeizoen).forEach(date -> createShiftIfNeeded(date));
 
         //        shiften.stream().forEach(System.out::println);
         //        tappers.stream().forEach(System.out::println);
@@ -62,33 +62,22 @@ public class Main {
         }
 
         switch (date.getDayOfWeek()) {
-        case MONDAY -> shiften.add(createShiftForTraining(date, VROUWEN)); // Training vrouwen
-        case TUESDAY -> {
-            if (date.isBefore(tapCursus)) { // Jeugd Dinsdag. Tot tapcursus leden, daarna op de te vullen door ouders
-                shiften.add(createJeugdShiftWeekdag(date, true));
-            } else {
+            case MONDAY -> shiften.add(createShiftForTraining(date, VROUWEN)); // Training vrouwen
+            case TUESDAY -> {
                 shiften.add(createJeugdShiftWeekdag(date, false));
+                shiften.add(createShiftForTraining(date, MANNEN)); // Training mannen
             }
-            shiften.add(createShiftForTraining(date, MANNEN)); // Training mannen
-        }
-        case THURSDAY -> {
-            if (date.isBefore(tapCursus)) { // Jeugd Donderdag. Tot tapcursus leden, daarna op de te vullen door ouders
+            case THURSDAY -> {
                 shiften.add(createJeugdShiftWeekdag(date, true));
-            } else {
-                shiften.add(createJeugdShiftWeekdag(date, false));
+                shiften.add(createShiftForTraining(date)); //Training mannen/vrouwen
             }
-            shiften.add(createShiftForTraining(date)); //Training mannen/vrouwen
-        }
-        case SATURDAY -> {
-            if (date.isBefore(tapCursus)) { // Jeugd Donderdag. Tot tapcursus leden, daarna op de te vullen door ouders
+            case SATURDAY -> {
                 shiften.add(createJeugdShiftZaterdag(date));
-            } else {
-                shiften.add(createJeugdShiftZaterdag(date));
+                createMatchShift(date); // Vrouwen matchen
             }
-            createMatchShift(date); // Vrouwen matchen
-        }
-        case SUNDAY -> createMatchShift(date); // Mannen matchen
-        case WEDNESDAY, FRIDAY -> {} // Niks op woensdag. Vrijdag doet touch zelf zijn toog. kunnen evt placeholders voor gemaakt worden?
+            case SUNDAY -> createMatchShift(date); // Mannen matchen
+            case WEDNESDAY, FRIDAY -> {
+            } // Niks op woensdag. Vrijdag doet touch zelf zijn toog. kunnen evt placeholders voor gemaakt worden?
         }
 
     }
@@ -106,122 +95,122 @@ public class Main {
 
     private static Shift createShiftForTraining(LocalDate date, Ploeg ploeg) {
         return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
-            date.getDayOfWeek(),
-            List.of(findTapperForTraining(ploeg), findTapperForTraining(ploeg)),
-            "Training " + ploeg.toString().toLowerCase());
+                date.getDayOfWeek(),
+                List.of(findTapperForTraining(ploeg), findTapperForTraining(ploeg)),
+                "Training " + ploeg.toString().toLowerCase());
     }
 
     private static Shift createJeugdShiftWeekdag(LocalDate date, boolean tappers) {
         return new Shift(date.atTime(18, 0), LocalTime.of(19, 30),
-            date.getDayOfWeek(),
-            tappers ? List.of(findTapperForTraining(MANNEN), findTapperForTraining(VROUWEN)) : List.of(),
-            "Training jeugd");
+                date.getDayOfWeek(),
+                tappers ? List.of(findTapperForTraining(MANNEN), findTapperForTraining(VROUWEN)) : List.of(),
+                "Training jeugd");
     }
 
     private static Shift createJeugdShiftZaterdag(LocalDate date) {
         return new Shift(date.atTime(9, 45), LocalTime.of(12, 30),
-            date.getDayOfWeek(),
-            List.of(findTapperForTraining(), findTapperForTraining()),
-            "Training jeugd");
+                date.getDayOfWeek(),
+                List.of(findTapperForTraining(), findTapperForTraining()),
+                "Training jeugd");
     }
 
     private static Shift createShiftForTraining(LocalDate date) {
         return new Shift(date.atTime(19, 30), LocalTime.of(00, 00),
-            date.getDayOfWeek(),
-            List.of(findTapperForTraining(), findTapperForTraining()),
-            "Training " + MANNEN.toString().toLowerCase() + "/" + VROUWEN.toString().toLowerCase());
+                date.getDayOfWeek(),
+                List.of(findTapperForTraining(), findTapperForTraining()),
+                "Training " + MANNEN.toString().toLowerCase() + "/" + VROUWEN.toString().toLowerCase());
     }
 
     private static Shift createMatchShift(LocalDate date, Ploeg ploeg) {
         return new Shift(date.atTime(13, 30), LocalTime.of(20, 00),
-            date.getDayOfWeek(),
-            IntStream.range(0, 6)
-                .mapToObj(i -> findTapperForMatch(ploeg))
-                .collect(toList()),
-            "Match " + getOtherPloeg(ploeg).toString().toLowerCase());
+                date.getDayOfWeek(),
+                IntStream.range(0, 6)
+                        .mapToObj(i -> findTapperForMatch(ploeg))
+                        .collect(toList()),
+                "Match " + getOtherPloeg(ploeg).toString().toLowerCase());
     }
 
     private static Tapper findTapperForTraining(Ploeg ploeg) {
         int leastAmountOfTrainingen = tappers.stream()
-            .filter(t -> t.getPloeg().equals(ploeg))
-            .map(Tapper::getAantalTrainingen)
-            .mapToInt(i -> i)
-            .min()
-            .getAsInt();
+                .filter(t -> t.getPloeg().equals(ploeg))
+                .map(Tapper::getAantalTrainingen)
+                .mapToInt(i -> i)
+                .min()
+                .getAsInt();
         List<Tapper> candidates = tappers.stream()
-            .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
-            .filter(t -> t.getPloeg().equals(ploeg))
-            .collect(toList());
+                .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+                .filter(t -> t.getPloeg().equals(ploeg))
+                .collect(toList());
         int leastAmountOfMatchen = candidates.stream()
-            .map(Tapper::getAantalMatchen)
-            .mapToInt(i->i)
-            .min()
-            .getAsInt();
+                .map(Tapper::getAantalMatchen)
+                .mapToInt(i -> i)
+                .min()
+                .getAsInt();
         Tapper tapper = candidates.stream()
-            .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
-            .findAny()
-            .get();
+                .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
+                .findAny()
+                .get();
         tapper.addTraining();
         return tapper;
     }
 
     private static Tapper findTapperForTraining() {
         int leastAmountOfTrainingen = tappers.stream()
-            .map(Tapper::getAantalTrainingen)
-            .mapToInt(i -> i)
-            .min()
-            .getAsInt();
+                .map(Tapper::getAantalTrainingen)
+                .mapToInt(i -> i)
+                .min()
+                .getAsInt();
         List<Tapper> candidates = tappers.stream()
-            .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
-            .collect(toList());
+                .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+                .collect(toList());
         int leastAmountOfMatchen = candidates.stream()
-            .map(Tapper::getAantalMatchen)
-            .mapToInt(i->i)
-            .min()
-            .getAsInt();
+                .map(Tapper::getAantalMatchen)
+                .mapToInt(i -> i)
+                .min()
+                .getAsInt();
 
         Tapper tapper = candidates.stream()
-            .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
-            .findAny()
-            .get();
+                .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
+                .findAny()
+                .get();
         tapper.addTraining();
         return tapper;
     }
 
     private static Tapper findTapperForMatch(Ploeg ploeg) {
         int leastAmountOfMatchen = tappers.stream()
-            .filter(t -> t.getPloeg().equals(ploeg))
-            .map(Tapper::getAantalMatchen)
-            .mapToInt(i -> i)
-            .min()
-            .getAsInt();
+                .filter(t -> t.getPloeg().equals(ploeg))
+                .map(Tapper::getAantalMatchen)
+                .mapToInt(i -> i)
+                .min()
+                .getAsInt();
         List<Tapper> candidates = tappers.stream()
-            .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
-            .filter(t -> t.getPloeg().equals(ploeg))
-            .collect(toList());
+                .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
+                .filter(t -> t.getPloeg().equals(ploeg))
+                .collect(toList());
         int leastAmountOfTrainingen = candidates.stream()
-            .map(Tapper::getAantalTrainingen)
-            .mapToInt(i->i)
-            .min()
-            .getAsInt();
+                .map(Tapper::getAantalTrainingen)
+                .mapToInt(i -> i)
+                .min()
+                .getAsInt();
         Collections.shuffle(candidates);
         Tapper tapper = candidates.stream()
-            .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
-            .findAny()
-            .get();
+                .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+                .findAny()
+                .get();
         tapper.addMatch();
         return tapper;
     }
 
     private static Optional<Entry<LocalDate, Ploeg>> dateHasHomeMatch(LocalDate date) {
         return matchen.entrySet().stream().filter(entry -> entry.getKey().isEqual(date))
-            .findFirst();
+                .findFirst();
     }
 
     private static void writeShiftenToCSV() {
         List<String[]> lines = shiften.stream()
-            .map(Shift::toArray)
-            .collect(toList());
+                .map(Shift::toArray)
+                .collect(toList());
         try {
             Path path = Paths.get(ClassLoader.getSystemResource("tappers.csv").toURI());
             try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString()))) {
@@ -238,8 +227,8 @@ public class Main {
         List<String[]> tapperLines = new ArrayList<>();
         tappers.stream().sorted().forEach(tapper -> {
             List<Shift> listForTapper = shiften.stream()
-                .filter(shift -> shift.tappers().contains(tapper))
-                .collect(toList());
+                    .filter(shift -> shift.tappers().contains(tapper))
+                    .collect(toList());
             tapperLines.add(tapper.createCVSLine(listForTapper));
         });
         try {
@@ -257,7 +246,7 @@ public class Main {
     private static void vulLedenLijst() {
         tappers = new ArrayList<>();
         tappers.add(new Tapper("Anthuenis Els", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Baetens Elien", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("Baetens Elien", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Bosman Kaat", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Bosman Lieselotte", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Buyle Hannelore", VROUWEN, false, 0, 0));
@@ -271,7 +260,7 @@ public class Main {
         tappers.add(new Tapper("De Decker Damiet", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("De Graef Kim", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("De Troyer Katrijn", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Vuyst Lynn", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("De Vuyst Lynn", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Dewitte Daphné", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Dierickx Evelyne", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Duerinck Manon", VROUWEN, false, 0, 0));
@@ -283,8 +272,8 @@ public class Main {
         tappers.add(new Tapper("Thibau Anke", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Van Driessche Ashley", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Van Driessche Irmgard", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, false, 1, 0));
-        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, false, 1, 0));
+        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, false, 0, 0));
+        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Van Zande Ilona", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Veyt Lieve", VROUWEN, false, 0, 0));
         tappers.add(new Tapper("Veyt Nele", VROUWEN, false, 0, 0));
@@ -338,22 +327,22 @@ public class Main {
 
     private static void vulMatchen() {
         matchen = new HashMap<>();
-        matchen.put(LocalDate.of(2022, 11, 2), MANNEN);
-        matchen.put(LocalDate.of(2022, 11, 27), MANNEN);
-        matchen.put(LocalDate.of(2023, 1, 29), MANNEN);
-        matchen.put(LocalDate.of(2023, 2, 12), MANNEN);
-        matchen.put(LocalDate.of(2023, 3, 12), MANNEN);
-        matchen.put(LocalDate.of(2023, 3, 26), MANNEN);
-        matchen.put(LocalDate.of(2023, 4, 23), MANNEN);
+        matchen.put(LocalDate.of(2023, 10, 1), MANNEN); //Laakdal
+        matchen.put(LocalDate.of(2023, 10, 22), MANNEN); //Mechelen
 
-        //        matchen.put(LocalDate.of(2022, 9, 24), Ploeg.VROUWEN);
-        matchen.put(LocalDate.of(2022, 10, 8), VROUWEN);
-        matchen.put(LocalDate.of(2022, 11, 5), VROUWEN);
-        matchen.put(LocalDate.of(2022, 11, 12), VROUWEN);
-        matchen.put(LocalDate.of(2022, 12, 3), VROUWEN);
-        matchen.put(LocalDate.of(2023, 1, 21), VROUWEN);
-        matchen.put(LocalDate.of(2023, 2, 4), VROUWEN);
-        matchen.put(LocalDate.of(2023, 3, 11), VROUWEN);
-        matchen.put(LocalDate.of(2023, 4, 8), VROUWEN);
+        matchen.put(LocalDate.of(2023, 9, 16), VROUWEN); //Oemoemenoe
+        matchen.put(LocalDate.of(2023, 9, 23), VROUWEN); //Pajot
+        matchen.put(LocalDate.of(2023, 10,14), VROUWEN); //Mechelen
+
+        matchen.put(LocalDate.of(2023, 9, 9), U14);
+        matchen.put(LocalDate.of(2023, 9, 30), U14);
+        matchen.put(LocalDate.of(2023, 10, 14), U14);
+
+        matchen.put(LocalDate.of(2023, 9, 9), U16);
+        matchen.put(LocalDate.of(2023, 10, 7), U16);
+
+        matchen.put(LocalDate.of(2023, 9, 9), U18);
+        matchen.put(LocalDate.of(2023, 9, 30), U18);
+        matchen.put(LocalDate.of(2023, 10, 21), U18);
     }
 }
