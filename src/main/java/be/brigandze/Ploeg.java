@@ -5,5 +5,6 @@ public enum Ploeg {
     VROUWEN,
     U14,
     U16,
-    U18
+    U18,
+    U15_U18_POWER_GIRLS
 }
