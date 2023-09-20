@@ -319,6 +319,7 @@ public class Main {
         tappers.add(new Tapper("De Groot Timothy", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Maesschalck Bram", MANNEN, false, 0, 0));
         tappers.add(new Tapper("De Saedelaere Simon", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Wouter De Witte", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Troyer Lucas", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Vreese Jacob", MANNEN, false, 0, 0));
         tappers.add(new Tapper("Eeckeleers Arne", MANNEN, false, 0, 0));
