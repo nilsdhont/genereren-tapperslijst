@@ -304,7 +304,7 @@ public class Main {
         tappers.add(new Tapper("Withofs Valerie", VROUWEN, false, 0, 0));
 
         //Mannen
-//        tappers.add(new Tapper("Boone Sven", MANNEN, false, 0, 0));
+        tappers.add(new Tapper("Boone Sven", MANNEN, false, 0, 0));
         tappers.add(new Tapper("Callebaut Anton", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("Celi Jarne", MANNEN, false, 0, 0));
         tappers.add(new Tapper("Christiaens Wout", MANNEN, false, 0, 0));
@@ -365,7 +365,7 @@ public class Main {
         matchen.put(LocalDate.of(2024, 3, 17), MANNEN); //Beernem
 
         matchen.put(LocalDate.of(2023, 9, 16), VROUWEN); //Oemoemenoe
-        matchen.put(LocalDate.of(2023, 9, 30), VROUWEN); //Laakdal
+        matchen.put(LocalDate.of(2023, 9, 23), VROUWEN); //Pajot
         matchen.put(LocalDate.of(2023, 10, 21), VROUWEN); //Mechelen
 
         matchenJeugd = new HashMap<>();
