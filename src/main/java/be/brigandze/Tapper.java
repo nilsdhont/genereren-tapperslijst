@@ -10,19 +10,13 @@ import static be.brigandze.Shift.vertaalDayOfWeek;
 public class Tapper implements Comparable<Tapper>{
 
     private String naam;
-    private Ploeg ploeg;
 
+    private Ploeg ploeg;
     private boolean isTrainer;
     private int aantalMatchen;
-    private int aantalTrainingen;
-
-    public Tapper(String naam, Ploeg ploeg, boolean isTrainer, int aantalMatchen, int aantalTrainingen) {
-        this.naam = naam;
-        this.ploeg = ploeg;
-        this.isTrainer = isTrainer;
-        this.aantalMatchen = aantalMatchen;
-        this.aantalTrainingen = aantalTrainingen;
-    }
+    private int aantalTrainingenMaandagDinsdag;
+    private int aantalTrainingenDonderdag;
+    private int aantalTrainingenJeugd;
 
     public String getNaam() {
         return naam;
@@ -40,6 +34,14 @@ public class Tapper implements Comparable<Tapper>{
         this.ploeg = ploeg;
     }
 
+    public boolean isTrainer() {
+        return isTrainer;
+    }
+
+    public void setTrainer(boolean trainer) {
+        isTrainer = trainer;
+    }
+
     public int getAantalMatchen() {
         return aantalMatchen;
     }
@@ -48,29 +50,43 @@ public class Tapper implements Comparable<Tapper>{
         this.aantalMatchen = aantalMatchen;
     }
 
-    public void addMatch(){
-        this.aantalMatchen++;
+    public int getAantalTrainingenMaandagDinsdag() {
+        return aantalTrainingenMaandagDinsdag;
     }
 
-    public int getAantalTrainingen() {
-        return aantalTrainingen;
+    public void setAantalTrainingenMaandagDinsdag(int aantalTrainingenMaandagDinsdag) {
+        this.aantalTrainingenMaandagDinsdag = aantalTrainingenMaandagDinsdag;
     }
 
-    public void setAantalTrainingen(int aantalTrainingen) {
-        this.aantalTrainingen = aantalTrainingen;
+    public int getAantalTrainingenDonderdag() {
+        return aantalTrainingenDonderdag;
+    }
+
+    public void setAantalTrainingenDonderdag(int aantalTrainingenDonderdag) {
+        this.aantalTrainingenDonderdag = aantalTrainingenDonderdag;
+    }
+
+    public int getAantalTrainingenJeugd() {
+        return aantalTrainingenJeugd;
+    }
+
+    public void setAantalTrainingenJeugd(int aantalTrainingenJeugd) {
+        this.aantalTrainingenJeugd = aantalTrainingenJeugd;
     }
 
     public void addTraining(){
-        aantalTrainingen++;
+        aantalTrainingenDonderdag++;
     }
-
+    public void addMatch(){
+        aantalMatchen++;
+    }
     @Override
     public String toString() {
         return "be.brigandze.Tapper{" +
             "naam='" + naam + '\'' +
             ", ploeg=" + ploeg +
             ", aantalMatchen=" + aantalMatchen +
-            ", aantalTrainingen=" + aantalTrainingen +
+            ", aantalTrainingen=" + aantalTrainingenDonderdag +
             '}';
     }
 
@@ -93,7 +109,7 @@ public class Tapper implements Comparable<Tapper>{
         List<String> list = new ArrayList<>();
         list.add(naam);
         list.add(String.valueOf(aantalMatchen));
-        list.add(String.valueOf(aantalTrainingen));
+        list.add(String.valueOf(aantalTrainingenDonderdag));
         listForTapper.forEach(shift -> {
             StringBuilder s = new StringBuilder();
             s.append(vertaalDayOfWeek(shift.startDateTime().getDayOfWeek()));

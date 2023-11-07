@@ -9,7 +9,55 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.DayOfWeek.*;
+
 public record Shift(LocalDateTime startDateTime, LocalTime endTime, DayOfWeek dayOfWeek, List<Tapper> tappers, String beschrijving) {
+
+    public static String vertaalDayOfWeek(DayOfWeek dayOfWeek) {
+        switch (dayOfWeek) {
+        case MONDAY -> {
+            return "Maandag";
+        }
+        case TUESDAY -> {
+            return "Dinsdag";
+        }
+        case THURSDAY -> {
+            return "Donderdag";
+        }
+        case SATURDAY -> {
+            return "Zaterdag";
+        }
+        case SUNDAY -> {
+            return "Zondag";
+        }
+        default -> {
+            return "";
+        }
+        }
+    }
+
+    public static DayOfWeek vertaalDayOfWeek( String dayOfWeek) {
+        switch (dayOfWeek) {
+            case  "Maandag"-> {
+                return MONDAY;
+            }
+            case "Dinsdag" -> {
+                return TUESDAY;
+            }
+            case "Donderdag" -> {
+                return THURSDAY;
+            }
+            case "Zaterdag" -> {
+                return SATURDAY;
+            }
+            case "Zondag" -> {
+                return SUNDAY;
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
 
     @Override
     public String toString() {
@@ -35,29 +83,6 @@ public record Shift(LocalDateTime startDateTime, LocalTime endTime, DayOfWeek da
         tempList.add(startDateTime.format(DateTimeFormatter.ofPattern("HH.mm")) + " - " + endTime.format(DateTimeFormatter.ofPattern("HH.mm")));
         tappers.forEach(tapper -> tempList.add(tapper.getNaam()));
         return tempList.toArray(new String[0]);
-    }
-
-    public static String vertaalDayOfWeek(DayOfWeek dayOfWeek) {
-        switch (dayOfWeek) {
-        case MONDAY -> {
-            return "Maandag";
-        }
-        case TUESDAY -> {
-            return "Dinsdag";
-        }
-        case THURSDAY -> {
-            return "Donderdag";
-        }
-        case SATURDAY -> {
-            return "Zaterdag";
-        }
-        case SUNDAY -> {
-            return "Zondag";
-        }
-        default -> {
-            return "";
-        }
-        }
     }
 }
 

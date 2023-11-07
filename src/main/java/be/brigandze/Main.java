@@ -39,18 +39,21 @@ public class Main {
 
     public static void main(String[] args) {
 
-        vulLedenLijst();
-        vulMatchen();
+        tappers = TappersManager.readTappersFromCSV();
+        shiften = Shiften.readExistingFromCSV(tappers);
+
+//        vulLedenLijst();
+//        vulMatchen();
         System.out.println("Aantal tappers: " + tappers.size());
-        System.out.println("Aantal matchen: " + matchen.size());
-
-
-        startSeizoen.datesUntil(eindSeizoen).forEach(date -> createShiftIfNeeded(date));
-
-                shiften.stream().forEach(System.out::println);
-                tappers.stream().forEach(System.out::println);
-        writeShiftenToCSV();
-        writePerTapperToCSV();
+//        System.out.println("Aantal matchen: " + matchen.size());
+//
+//
+//        startSeizoen.datesUntil(eindSeizoen).forEach(date -> createShiftIfNeeded(date));
+//
+//                shiften.stream().forEach(System.out::println);
+//                tappers.stream().forEach(System.out::println);
+//        writeShiftenToCSV();
+//        writePerTapperToCSV();
     }
 
     private static void createShiftIfNeeded(LocalDate date) {
@@ -150,12 +153,12 @@ public class Main {
     private static Tapper findTapperForTraining(Ploeg ploeg) {
         int leastAmountOfTrainingen = tappers.stream()
                 .filter(t -> t.getPloeg().equals(ploeg))
-                .map(Tapper::getAantalTrainingen)
+                .map(Tapper::getAantalTrainingenDonderdag)
                 .mapToInt(i -> i)
                 .min()
                 .getAsInt();
         List<Tapper> candidates = tappers.stream()
-                .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+                .filter(t -> t.getAantalTrainingenDonderdag() == leastAmountOfTrainingen)
                 .filter(t -> t.getPloeg().equals(ploeg))
                 .collect(toList());
         int leastAmountOfMatchen = candidates.stream()
@@ -173,12 +176,12 @@ public class Main {
 
     private static Tapper findTapperForTraining() {
         int leastAmountOfTrainingen = tappers.stream()
-                .map(Tapper::getAantalTrainingen)
+                .map(Tapper::getAantalTrainingenDonderdag)
                 .mapToInt(i -> i)
                 .min()
                 .getAsInt();
         List<Tapper> candidates = tappers.stream()
-                .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+                .filter(t -> t.getAantalTrainingenDonderdag() == leastAmountOfTrainingen)
                 .collect(toList());
         int leastAmountOfMatchen = candidates.stream()
                 .map(Tapper::getAantalMatchen)
@@ -206,13 +209,13 @@ public class Main {
                 .filter(t -> t.getPloeg().equals(ploeg))
                 .collect(toList());
         int leastAmountOfTrainingen = candidates.stream()
-                .map(Tapper::getAantalTrainingen)
+                .map(Tapper::getAantalTrainingenDonderdag)
                 .mapToInt(i -> i)
                 .min()
                 .getAsInt();
         Collections.shuffle(candidates);
         Tapper tapper = candidates.stream()
-                .filter(t -> t.getAantalTrainingen() == leastAmountOfTrainingen)
+                .filter(t -> t.getAantalTrainingenDonderdag() == leastAmountOfTrainingen)
                 .findAny()
                 .get();
         tapper.addMatch();
@@ -232,7 +235,7 @@ public class Main {
                 .map(Shift::toArray)
                 .collect(toList());
         try {
-            Path path = Paths.get(ClassLoader.getSystemResource("tappers.csv").toURI());
+            Path path = Paths.get(ClassLoader.getSystemResource("tapperslijst.csv").toURI());
             try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString()))) {
                 lines.forEach(writer::writeNext);
             } catch (IOException e) {
@@ -264,95 +267,95 @@ public class Main {
     }
 
     private static void vulLedenLijst() {
-        tappers = new ArrayList<>();
-        tappers.add(new Tapper("Anthuenis Els", VROUWEN, false, 0, 0));
+//        tappers = new ArrayList<>();
+//        tappers.add(new Tapper("Anthuenis Els", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("Baetens Elien", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Bosman Kaat", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Bosman Kaat", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("Bosman Lieselotte", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Buyle Hannelore", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Cooreman Ludiwien", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Dauwe Irjen", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Beir Jasmine", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Bondt Silke", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Brabander Jana", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Brabander Jitske", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Cock Lyana", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Decker Damiet", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Buyle Hannelore", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Cooreman Ludiwien", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Dauwe Irjen", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Beir Jasmine", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Bondt Silke", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Brabander Jana", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Brabander Jitske", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Cock Lyana", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Decker Damiet", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("De Graef Kim", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("De Troyer Katrijn", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("De Troyer Katrijn", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("De Vuyst Lynn", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Dewitte Daphné", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Dierickx Evelyne", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Duerinck Manon", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Dewitte Daphné", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Dierickx Evelyne", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Duerinck Manon", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("Dumez Charlotte", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Haentjes Lisa", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Moerman Britt", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Raes Liesbeth", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Haentjes Lisa", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Moerman Britt", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Raes Liesbeth", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("Reper Charo", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Ruymaekers Lynn", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Schatteman Brenthe", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Scholliers Jana", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Steyaert Tini", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Thibau Anke", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Van Driessche Ashley", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Ruymaekers Lynn", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Schatteman Brenthe", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Scholliers Jana", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Steyaert Tini", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Thibau Anke", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Driessche Ashley", VROUWEN, false, 0, 0));
 //        tappers.add(new Tapper("Van Driessche Irmgard", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Van Zande Ilona", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Veyt Lieve", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Veyt Nele", VROUWEN, false, 0, 0));
-        tappers.add(new Tapper("Withofs Valerie", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Malderen Emma", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Puyvelde Anke", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Zande Ilona", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Veyt Lieve", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Veyt Nele", VROUWEN, false, 0, 0));
+//        tappers.add(new Tapper("Withofs Valerie", VROUWEN, false, 0, 0));
 
         //Mannen
-        tappers.add(new Tapper("Boone Sven", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Callebaut Anton", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Boone Sven", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Callebaut Anton", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("Celi Jarne", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Christiaens Wout", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Criel Dajo", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("D'hont Kjell", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("D'hont Nils", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("De Bie Hans", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("De Bruyne Lieven", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("De Coster Bram", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("De Cuyper Sam", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Christiaens Wout", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Criel Dajo", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("D'hont Kjell", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("D'hont Nils", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("De Bie Hans", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("De Bruyne Lieven", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("De Coster Bram", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("De Cuyper Sam", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Graeve Yenthel", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("De Groot Timothy", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("De Groot Timothy", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Maesschalck Bram", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("De Saedelaere Simon", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Wouter De Witte", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("De Saedelaere Simon", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Wouter De Witte", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Troyer Lucas", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("De Vreese Jacob", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Eeckeleers Arne", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Eeckeleers Arne", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("Everaert Frederik", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Govaert Arno", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Heirman Kristof", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Huygens Jeroen", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Govaert Arno", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Heirman Kristof", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Huygens Jeroen", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("Kerre Davy", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Klein Joni", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Lanckbeen Tom", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Luinstra Tuur", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Klein Joni", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Lanckbeen Tom", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Luinstra Tuur", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("Matthijs Piet", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Moerman Geert", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Pieters Jonathan", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Raemdonck Preben", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Rijckbosch Ebbe", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Roelandt Tom", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Rottiers Sam", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Schatteman-Bracke Elias", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Scrivens Jason", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Spriet Juul", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Thibau Davy", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Van De Voorde Filip", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Van Hauwermeiren Koen", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Ben", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Van Puyvelde Stef", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Verbruggen Peter-Paul", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Vermeir Aaron", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Moerman Geert", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Pieters Jonathan", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Raemdonck Preben", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Rijckbosch Ebbe", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Roelandt Tom", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Rottiers Sam", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Schatteman-Bracke Elias", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Scrivens Jason", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Spriet Juul", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Thibau Davy", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Van De Voorde Filip", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Hauwermeiren Koen", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Puyvelde Ben", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Van Puyvelde Stef", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Verbruggen Peter-Paul", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Vermeir Aaron", MANNEN, false, 0, 0));
 //        tappers.add(new Tapper("Vermonden Joeri", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Waegeman Yorick", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Withofs Wouter", MANNEN, false, 0, 0));
-        tappers.add(new Tapper("Zaman Alexander", MANNEN, false, 0, 0));
-        Collections.shuffle(tappers);
+//        tappers.add(new Tapper("Waegeman Yorick", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Withofs Wouter", MANNEN, false, 0, 0));
+//        tappers.add(new Tapper("Zaman Alexander", MANNEN, false, 0, 0));
+//        Collections.shuffle(tappers);
     }
 
     private static void vulMatchen() {
