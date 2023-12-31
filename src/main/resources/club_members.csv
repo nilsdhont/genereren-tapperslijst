@@ -10,7 +10,7 @@ De Brabander Jitske,VROUWEN,false
 De Cock Lyana,VROUWEN,false
 De Decker Damiet,VROUWEN,false
 De Troyer Katrijn,VROUWEN,false
-Dewitte Daphné,VROUWEN,false
+Dewitte Daphné,VROUWEN,true
 Dierickx Evelyne,VROUWEN,false
 Duerinck Manon,VROUWEN,false
 Haentjes Lisa,VROUWEN,false
@@ -22,13 +22,13 @@ Scholliers Jana,VROUWEN,false
 Steyaert Tini,VROUWEN,false
 Thibau Anke,VROUWEN,false
 Van Driessche Ashley,VROUWEN,false
-Van Malderen Emma,VROUWEN,false
+Van Malderen Emma,VROUWEN,true
 Van Puyvelde Anke,VROUWEN,false
 Van Zande Ilona,VROUWEN,false
 Veyt Lieve,VROUWEN,false
 Veyt Nele,VROUWEN,false
 Withofs Valerie,VROUWEN,false
-Boone Sven,MANNEN,false
+Boone Sven,MANNEN,true
 Callebaut Anton,MANNEN,false
 Christiaens Wout,MANNEN,false
 Criel Dajo,MANNEN,false
@@ -45,26 +45,26 @@ Eeckeleers Arne,MANNEN,false
 Govaert Arno,MANNEN,false
 Heirman Kristof,MANNEN,false
 Huygens Jeroen,MANNEN,false
-Klein Joni,MANNEN,false
+Klein Joni,MANNEN,true
 Lanckbeen Tom,MANNEN,false
 Luinstra Tuur,MANNEN,false
 Moerman Geert,MANNEN,false
 Pieters Jonathan,MANNEN,false
 Raemdonck Preben,MANNEN,false
-Rijckbosch Ebbe,MANNEN,false
+Rijckbosch Ebbe,MANNEN,true
 Roelandt Tom,MANNEN,false
-Rottiers Sam,MANNEN,false
+Rottiers Sam,MANNEN,true
 Schatteman-Bracke Elias,MANNEN,false
 Scrivens Jason,MANNEN,false
-Spriet Juul,MANNEN,false
+Spriet Juul,MANNEN,true
 Thibau Davy,MANNEN,false
-Van De Voorde Filip,MANNEN,false
-Van Hauwermeiren Koen,MANNEN,false
+Van De Voorde Filip,MANNEN,true
+Van Hauwermeiren Koen,MANNEN,true
 Van Puyvelde Ben,MANNEN,false
 Van Puyvelde Stef,MANNEN,false
 Verbruggen Peter-Paul,MANNEN,false
 Vermeir Aaron,MANNEN,false
-Waegeman Yorick,MANNEN,false
+Waegeman Yorick,MANNEN,true
 Withofs Wouter,MANNEN,false
 Zaman Alexander,MANNEN,false
 Lien van Hecke,TOUCH,false

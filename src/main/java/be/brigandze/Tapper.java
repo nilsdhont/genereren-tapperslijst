@@ -16,6 +16,20 @@ public class Tapper implements Comparable<Tapper>{
     private int aantalMatchen;
     private int aantalTrainingenMaandagDinsdag;
     private int aantalTrainingenDonderdag;
+
+    @Override
+    public String toString() {
+        return "Tapper{" +
+                "naam='" + naam + '\'' +
+                ", ploeg=" + ploeg +
+                ", isTrainer=" + isTrainer +
+                ", aantalMatchen=" + aantalMatchen +
+                ", aantalTrainingenMaandagDinsdag=" + aantalTrainingenMaandagDinsdag +
+                ", aantalTrainingenDonderdag=" + aantalTrainingenDonderdag +
+                ", aantalTrainingenJeugd=" + aantalTrainingenJeugd +
+                '}';
+    }
+
     private int aantalTrainingenJeugd;
 
     public String getNaam() {
@@ -46,48 +60,35 @@ public class Tapper implements Comparable<Tapper>{
         return aantalMatchen;
     }
 
-    public void setAantalMatchen(int aantalMatchen) {
-        this.aantalMatchen = aantalMatchen;
-    }
 
     public int getAantalTrainingenMaandagDinsdag() {
         return aantalTrainingenMaandagDinsdag;
     }
 
-    public void setAantalTrainingenMaandagDinsdag(int aantalTrainingenMaandagDinsdag) {
-        this.aantalTrainingenMaandagDinsdag = aantalTrainingenMaandagDinsdag;
-    }
 
     public int getAantalTrainingenDonderdag() {
         return aantalTrainingenDonderdag;
     }
 
-    public void setAantalTrainingenDonderdag(int aantalTrainingenDonderdag) {
-        this.aantalTrainingenDonderdag = aantalTrainingenDonderdag;
-    }
 
     public int getAantalTrainingenJeugd() {
         return aantalTrainingenJeugd;
     }
 
-    public void setAantalTrainingenJeugd(int aantalTrainingenJeugd) {
-        this.aantalTrainingenJeugd = aantalTrainingenJeugd;
+
+    public void addTrainingDonderdag(){
+        aantalTrainingenDonderdag++;
     }
 
-    public void addTraining(){
-        aantalTrainingenDonderdag++;
+    public void addTrainingMaandagDinsdag(){
+        aantalTrainingenMaandagDinsdag++;
+    }
+
+    public void addTrainingJeugd(){
+        aantalTrainingenJeugd++;
     }
     public void addMatch(){
         aantalMatchen++;
-    }
-    @Override
-    public String toString() {
-        return "be.brigandze.Tapper{" +
-            "naam='" + naam + '\'' +
-            ", ploeg=" + ploeg +
-            ", aantalMatchen=" + aantalMatchen +
-            ", aantalTrainingen=" + aantalTrainingenDonderdag +
-            '}';
     }
 
     @Override
@@ -108,8 +109,10 @@ public class Tapper implements Comparable<Tapper>{
     public String[] createCVSLine(List<Shift> listForTapper) {
         List<String> list = new ArrayList<>();
         list.add(naam);
-        list.add(String.valueOf(aantalMatchen));
+        list.add(String.valueOf(aantalTrainingenMaandagDinsdag));
         list.add(String.valueOf(aantalTrainingenDonderdag));
+        list.add(String.valueOf(aantalTrainingenJeugd));
+        list.add(String.valueOf(aantalMatchen));
         listForTapper.forEach(shift -> {
             StringBuilder s = new StringBuilder();
             s.append(vertaalDayOfWeek(shift.startDateTime().getDayOfWeek()));
@@ -125,5 +128,14 @@ public class Tapper implements Comparable<Tapper>{
     @Override
     public int compareTo(Tapper t) {
         return this.naam.compareTo(t.naam);
+    }
+
+    public void addShift(SoortShift soortShift) {
+        switch (soortShift){
+            case TRAINING_JEUGD -> aantalTrainingenJeugd++;
+            case TRAINING_MAANDAG, TRAINING_DINSDAG -> aantalTrainingenMaandagDinsdag++;
+            case TRAINING_DONDERDAG -> aantalTrainingenDonderdag++;
+            case MATCH_JEUGD, MATCH_SENIOREN_VROUWEN, MATCH_SENIOREN_MANNEN -> aantalMatchen++;
+        }
     }
 }

@@ -43,7 +43,7 @@ public class Shiften {
             Optional<Tapper> first = allTappers.stream().filter(tapper -> tapper.getNaam().equalsIgnoreCase(line[finalI])).findFirst();
             if(first.isPresent()){
                 tappers.add(first.get());
-
+                first.get().addShift(SoortShift.fromBeschrijving(beschrijving));
             }
 
         }
