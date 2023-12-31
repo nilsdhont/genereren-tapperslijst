@@ -31,7 +31,7 @@ public class Main {
 
   // TODO Periodes voor schoolverloven
 
-  private static LocalDate startSeizoen = LocalDate.of(2023, 11, 9);
+  private static LocalDate startSeizoen = LocalDate.of(2024, 01, 4);
   private static LocalDate startWinterStop = LocalDate.of(2023, 12, 22);
   private static LocalDate endWinterStop = LocalDate.of(2024, 1, 3);
   private static LocalDate eindSeizoen = LocalDate.of(2024, 5, 19);
@@ -420,20 +420,32 @@ public class Main {
     matchen.put(LocalDate.of(2023, 12, 3), MANNEN); // DRC3
     matchen.put(LocalDate.of(2023, 12, 10), MANNEN); // Arendonk
     matchen.put(LocalDate.of(2024, 1, 28), MANNEN); // Curtrycke
+    matchen.put(LocalDate.of(2024, 2, 11), MANNEN); // DRC3
+    matchen.put(LocalDate.of(2024, 2, 25), MANNEN); // Mechelen
     matchen.put(LocalDate.of(2024, 3, 17), MANNEN); // Beernem
 
     matchen.put(LocalDate.of(2023, 9, 16), VROUWEN); // Oemoemenoe
     matchen.put(LocalDate.of(2023, 9, 23), VROUWEN); // Pajot
     matchen.put(LocalDate.of(2023, 10, 21), VROUWEN); // Mechelen
 
+    matchen.put(LocalDate.of(2024, 01, 13), VROUWEN); // Entente Kortrijk/dmd/leuven
+    matchen.put(LocalDate.of(2024, 01, 27), VROUWEN); // ottignies
+
     matchenJeugd = new HashMap<>();
+    matchenJeugd.put(LocalDate.of(2024, 11, 11), U10);
+
     matchenJeugd.put(LocalDate.of(2023, 9, 9), U14);
     matchenJeugd.put(LocalDate.of(2023, 9, 30), U14);
     matchenJeugd.put(LocalDate.of(2023, 10, 14), U14);
     matchenJeugd.put(LocalDate.of(2023, 11, 11), U14);
 
+    matchenJeugd.put(LocalDate.of(2024, 04, 13), U14);
+
     matchenJeugd.put(LocalDate.of(2023, 9, 9), U16);
     matchenJeugd.put(LocalDate.of(2023, 10, 7), U16);
+
+    matchenJeugd.put(LocalDate.of(2024, 01, 20), U16);
+    matchenJeugd.put(LocalDate.of(2024, 04, 20), U16);
 
     matchenJeugd.put(LocalDate.of(2023, 9, 9), U18);
     matchenJeugd.put(LocalDate.of(2023, 9, 30), U18);
