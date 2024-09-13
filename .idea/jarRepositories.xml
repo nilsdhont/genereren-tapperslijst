@@ -18,8 +18,18 @@
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://repo.gcloud.belgium.be/artifactory/vas-maven-central" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
       <option name="name" value="central" />
       <option name="url" value="https://nexus.recip-e.be/repository/maven-public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="artifactory-central-vas" />
+      <option name="name" value="artifactory-central-vas" />
+      <option name="url" value="https://repo.gcloud.belgium.be/artifactory/vas-maven-central" />
     </remote-repository>
   </component>
 </project>

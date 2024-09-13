@@ -31,10 +31,10 @@ public class Main {
 
   // TODO Periodes voor schoolverloven
 
-  private static LocalDate startSeizoen = LocalDate.of(2024, 01, 4);
-  private static LocalDate startWinterStop = LocalDate.of(2023, 12, 22);
-  private static LocalDate endWinterStop = LocalDate.of(2024, 1, 3);
-  private static LocalDate eindSeizoen = LocalDate.of(2024, 5, 19);
+  private static LocalDate startSeizoen = LocalDate.of(2024, 9, 15);
+  private static LocalDate startWinterStop = LocalDate.of(2024, 12, 20);
+  private static LocalDate endWinterStop = LocalDate.of(2025, 1, 5);
+  private static LocalDate eindSeizoen = LocalDate.of(2025, 5, 11);
 
   //    private static LocalDate firstDateZaterdagJeugdShiftTweeWekelijks = LocalDate.of(2022, 9,
   // 24);
@@ -68,7 +68,7 @@ public class Main {
         shiften.add(createShiftForTrainingMaandagDinsdag(date, MANNEN)); // Training mannen
       }
       case THURSDAY -> {
-        shiften.add(createJeugdShiftWeekdag(date, true));
+        shiften.add(createJeugdShiftWeekdag(date, false));
         shiften.add(createShiftForTrainingDonderdag(date)); // Training mannen/vrouwen7
 
       }
@@ -157,7 +157,7 @@ public class Main {
 
     return new Shift(
         match.getKey().atTime(time),
-        time.plusHours(2),
+        time.plusHours(3),
         match.getKey().getDayOfWeek(),
         List.of(findTapperForTrainingJeugd(), findTapperForTrainingJeugd()),
         "Match Jeugd");
@@ -250,7 +250,7 @@ public class Main {
             .map(Tapper::getAantalMatchen)
             .mapToInt(i -> i)
             .min()
-            .getAsInt();
+            .orElse(0);
     List<Tapper> candidates =
         tappers.stream()
             .filter(t -> t.getAantalMatchen() == leastAmountOfMatchen)
@@ -414,43 +414,45 @@ public class Main {
 
   private static void vulMatchen() {
     matchen = new HashMap<>();
-    matchen.put(LocalDate.of(2023, 10, 1), MANNEN); // Laakdal
-    matchen.put(LocalDate.of(2023, 10, 22), MANNEN); // Mechelen
-    matchen.put(LocalDate.of(2023, 11, 12), MANNEN); // Waereghem
-    matchen.put(LocalDate.of(2023, 12, 3), MANNEN); // DRC3
-    matchen.put(LocalDate.of(2023, 12, 10), MANNEN); // Arendonk
-    matchen.put(LocalDate.of(2024, 1, 28), MANNEN); // Curtrycke
-    matchen.put(LocalDate.of(2024, 2, 11), MANNEN); // DRC3
-    matchen.put(LocalDate.of(2024, 2, 25), MANNEN); // Mechelen
-    matchen.put(LocalDate.of(2024, 3, 17), MANNEN); // Beernem
+    matchen.put(LocalDate.of(2024, 9, 15), MANNEN); // Arendonk
+    matchen.put(LocalDate.of(2024, 9, 29), MANNEN); // Waereghem
+    matchen.put(LocalDate.of(2024, 10, 20), MANNEN); // Lommel
+    matchen.put(LocalDate.of(2024, 11, 17), MANNEN); // RC9
+    matchen.put(LocalDate.of(2024, 12, 8), MANNEN); // DRC3
+    matchen.put(LocalDate.of(2025, 2, 9), MANNEN); // Brugge
+    matchen.put(LocalDate.of(2025, 2, 23), MANNEN); // Vorst
+    matchen.put(LocalDate.of(2025, 3, 23), MANNEN); // Kortrijk
+    matchen.put(LocalDate.of(2025, 4, 27), MANNEN); // Laakdal
 
-    matchen.put(LocalDate.of(2023, 9, 16), VROUWEN); // Oemoemenoe
-    matchen.put(LocalDate.of(2023, 9, 23), VROUWEN); // Pajot
-    matchen.put(LocalDate.of(2023, 10, 21), VROUWEN); // Mechelen
-
-    matchen.put(LocalDate.of(2024, 01, 13), VROUWEN); // Entente Kortrijk/dmd/leuven
-    matchen.put(LocalDate.of(2024, 01, 27), VROUWEN); // ottignies
+    matchen.put(LocalDate.of(2024, 9, 21), VROUWEN); // Kortijk
+    matchen.put(LocalDate.of(2024, 10, 12), VROUWEN); // Hamme
+    matchen.put(LocalDate.of(2024, 11, 9), VROUWEN); // Liege
+    matchen.put(LocalDate.of(2024, 12, 7), VROUWEN); // ASUB
+    matchen.put(LocalDate.of(2025, 1, 25), VROUWEN); // RC9
 
     matchenJeugd = new HashMap<>();
-    matchenJeugd.put(LocalDate.of(2024, 11, 11), U10);
-
-    matchenJeugd.put(LocalDate.of(2023, 9, 9), U14);
-    matchenJeugd.put(LocalDate.of(2023, 9, 30), U14);
-    matchenJeugd.put(LocalDate.of(2023, 10, 14), U14);
-    matchenJeugd.put(LocalDate.of(2023, 11, 11), U14);
-
-    matchenJeugd.put(LocalDate.of(2024, 04, 13), U14);
-
-    matchenJeugd.put(LocalDate.of(2023, 9, 9), U16);
-    matchenJeugd.put(LocalDate.of(2023, 10, 7), U16);
-
-    matchenJeugd.put(LocalDate.of(2024, 01, 20), U16);
-    matchenJeugd.put(LocalDate.of(2024, 04, 20), U16);
-
-    matchenJeugd.put(LocalDate.of(2023, 9, 9), U18);
-    matchenJeugd.put(LocalDate.of(2023, 9, 30), U18);
-    matchenJeugd.put(LocalDate.of(2023, 10, 21), U18);
-    matchenJeugd.put(LocalDate.of(2023, 11, 18), U18);
+    matchenJeugd.put(LocalDate.of(2024, 9, 21), TORNOOI);
+    matchenJeugd.put(LocalDate.of(2024, 9, 21), TORNOOI);
+    matchenJeugd.put(LocalDate.of(2024, 10, 12), TORNOOI);
+    matchenJeugd.put(LocalDate.of(2024, 11, 21), TORNOOI);
+//
+//    matchenJeugd.put(LocalDate.of(2023, 9, 9), U14TO);
+//    matchenJeugd.put(LocalDate.of(2023, 9, 30), U14);
+//    matchenJeugd.put(LocalDate.of(2023, 10, 14), U14);
+//    matchenJeugd.put(LocalDate.of(2023, 11, 11), U14);
+//
+//    matchenJeugd.put(LocalDate.of(2024, 04, 13), U14);
+//
+//    matchenJeugd.put(LocalDate.of(2023, 9, 9), U16);
+//    matchenJeugd.put(LocalDate.of(2023, 10, 7), U16);
+//
+//    matchenJeugd.put(LocalDate.of(2024, 01, 20), U16);
+//    matchenJeugd.put(LocalDate.of(2024, 04, 20), U16);
+//
+//    matchenJeugd.put(LocalDate.of(2023, 9, 9), U18);
+//    matchenJeugd.put(LocalDate.of(2023, 9, 30), U18);
+//    matchenJeugd.put(LocalDate.of(2023, 10, 21), U18);
+//    matchenJeugd.put(LocalDate.of(2023, 11, 18), U18);
 
     //        matchenJeugd.put(LocalDate.of(2023, 11, 5), U15_U18_POWER_GIRLS);
   }

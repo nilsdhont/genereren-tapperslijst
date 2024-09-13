@@ -4,6 +4,7 @@ public enum Ploeg {
     MANNEN(false, true, true, true),
     VROUWEN(false, true, true, true),
     TOUCH(false, false, true, false),
+    TORNOOI(true, false, false, false),
     U6(true, false, false, false),
     U8(true, false, false, false),
     U10(true, false, false, false),

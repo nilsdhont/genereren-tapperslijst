@@ -1,94 +1,84 @@
-Anthuenis Els,VROUWEN,false
-Bosman Kaat,VROUWEN,false
-Buyle Hannelore,VROUWEN,false
-Cooreman Ludiwien,VROUWEN,false
-Dauwe Irjen,VROUWEN,false
-De Beir Jasmine,VROUWEN,false
-De Bondt Silke,VROUWEN,false
-De Brabander Jana,VROUWEN,false
-De Brabander Jitske,VROUWEN,false
-De Cock Lyana,VROUWEN,false
-De Decker Damiet,VROUWEN,false
-De Troyer Katrijn,VROUWEN,false
-Dewitte Daphné,VROUWEN,true
-Dierickx Evelyne,VROUWEN,false
-Duerinck Manon,VROUWEN,false
-Haentjes Lisa,VROUWEN,false
-Moerman Britt,VROUWEN,false
-Raes Liesbeth,VROUWEN,false
-Ruymaekers Lynn,VROUWEN,false
-Schatteman Brenthe,VROUWEN,false
-Scholliers Jana,VROUWEN,false
-Steyaert Tini,VROUWEN,false
-Thibau Anke,VROUWEN,false
-Van Driessche Ashley,VROUWEN,false
-Van Malderen Emma,VROUWEN,true
-Van Puyvelde Anke,VROUWEN,false
-Van Zande Ilona,VROUWEN,false
-Veyt Lieve,VROUWEN,false
-Veyt Nele,VROUWEN,false
-Withofs Valerie,VROUWEN,false
-Boone Sven,MANNEN,true
-Callebaut Anton,MANNEN,false
-Christiaens Wout,MANNEN,false
-Criel Dajo,MANNEN,false
-D'hont Kjell,MANNEN,false
-D'hont Nils,MANNEN,false
-De Bie Hans,MANNEN,false
-De Bruyne Lieven,MANNEN,false
-De Coster Bram,MANNEN,false
-De Cuyper Sam,MANNEN,false
-De Groot Timothy,MANNEN,false
-De Saedelaere Simon,MANNEN,false
+Aaron Vermeir,MANNEN,false
+Alexander Zaman,MANNEN,false
+Anton Callebaut,MANNEN,false
+Arne Eeckeleers,MANNEN,false
+Arne van de Perre,MANNEN,false
+Arno Govaert,MANNEN,false
+Ben Van Puyvelde,MANNEN,false
+Bram De Coster,MANNEN,false
+Ebbe Ryckebosch,MANNEN,true
+Emile Van Kerckhove,MANNEN,false
+Fille Van De Voorde,MANNEN,true
+Frederik Ivens,MANNEN,false
+Hans De Bie,MANNEN,false
+Jason Scrivens,MANNEN,false
+Jeroen Huygens,MANNEN,false
+Joeri Vermonden,MANNEN,false
+Jonathan Pieters,MANNEN,false
+Joni Klein,MANNEN,true
+Joris Peeraer,MANNEN,false
+Juul Spriet,MANNEN,true
+Kennedy Minu Nyokabi,MANNEN,false
+Kjell D'hont,MANNEN,false
+Kristof Heirman,MANNEN,false
+Maarten de Feyter,MANNEN,false
+Nils D'hont,MANNEN,false
+Peter-Paul Verbruggen,MANNEN,false
+Sam De Cuyper,MANNEN,false
+Sam Rottiers,MANNEN,true
+Stef Van Puyvelde,MANNEN,false
+Sven Boone,MANNEN,false
+Timothy De Groot,MANNEN,false
+Tom Lanckbeen,MANNEN,false
+Wout Christiaens,MANNEN,false
 Wouter De Witte,MANNEN,false
-Eeckeleers Arne,MANNEN,false
-Govaert Arno,MANNEN,false
-Heirman Kristof,MANNEN,false
-Huygens Jeroen,MANNEN,false
-Klein Joni,MANNEN,true
-Lanckbeen Tom,MANNEN,false
-Luinstra Tuur,MANNEN,false
-Moerman Geert,MANNEN,false
-Pieters Jonathan,MANNEN,false
-Raemdonck Preben,MANNEN,false
-Rijckbosch Ebbe,MANNEN,true
-Roelandt Tom,MANNEN,false
-Rottiers Sam,MANNEN,true
-Schatteman-Bracke Elias,MANNEN,false
-Scrivens Jason,MANNEN,false
-Spriet Juul,MANNEN,true
-Thibau Davy,MANNEN,false
-Van De Voorde Filip,MANNEN,true
-Van Hauwermeiren Koen,MANNEN,true
-Van Puyvelde Ben,MANNEN,false
-Van Puyvelde Stef,MANNEN,false
-Verbruggen Peter-Paul,MANNEN,false
-Vermeir Aaron,MANNEN,false
-Waegeman Yorick,MANNEN,true
-Withofs Wouter,MANNEN,false
-Zaman Alexander,MANNEN,false
-Lien van Hecke,TOUCH,false
-Simon Pilaert,TOUCH,true
-Kristel Osselaer,TOUCH,false
-Lieven de Bruyne,TOUCH,false
-Lynn claus,TOUCH,false
-Stefan,TOUCH,false
-Abdon,TOUCH,false
-Caroline,TOUCH,false
-Karolien Van Herrewegen,TOUCH,false
-Cathinca Van De Velde,TOUCH,false
-Elisabeth Vancerkerckhove,TOUCH,false
-Els Sichien,TOUCH,false
-Esther Beeckman,TOUCH,false
-Hilde,TOUCH,false
-Ilse,TOUCH,false
-Jarissa,TOUCH,false
-Jelle Verheirstraeten,TOUCH,false
-John Joseph Wembridge,TOUCH,false
-Katrien de Sadeleer,TOUCH,false
-Maité De Decker,TOUCH,false
-Nele Lievens,TOUCH,false
-Soetkin,TOUCH,false
-Enna vande Meirssche,TOUCH,false
-Yara,TOUCH,false
-Yoran,TOUCH,false
+Wouter Withofs,MANNEN,false
+Yorick Wageman,MANNEN,true
+Simon De Saedelaere,MANNEN,false
+Koen Van Hauwermeire,MANNEN,false
+Corneel Michem,MANNEN,false
+Tom Roeland,MANNEN,false
+Els Antheunis,VROUWEN,false
+Elien Baetens,VROUWEN,false
+Sofia Ben Omar,VROUWEN,false
+Kaat Bosman,VROUWEN,false
+lieselotte Bosman,VROUWEN,false
+Hannelore Buyle,VROUWEN,false
+Ludiwien Cooreman,VROUWEN,false
+Irjen Dauwe,VROUWEN,false
+Jasmine De Beir,VROUWEN,false
+Jana De Brabander,VROUWEN,false
+Jitske De Brabander,VROUWEN,false
+Damiet De Decker,VROUWEN,false
+Zoë De Praeter,VROUWEN,false
+Camille De Raedt,VROUWEN,false
+Mieke De Rijcke,VROUWEN,false
+Katrijn De Troyer,VROUWEN,false
+Daphné Dewitte,VROUWEN,false
+Evelyne Dierickx,VROUWEN,false
+Manon Duerinck,VROUWEN,false
+Charlotte Dumez,VROUWEN,false
+Lara Geenens,VROUWEN,false
+Lisa Haentjens,VROUWEN,false
+Coralie Heekhout,VROUWEN,false
+Britt Moerman,VROUWEN,false
+Manon Plaetinck,VROUWEN,false
+Liesbeth Raes,VROUWEN,false
+Lynn Ruymaekers,VROUWEN,false
+Brenthe Schatteman,VROUWEN,false
+Jana Scholliers,VROUWEN,false
+Tini Steyaert,VROUWEN,false
+Anke Thibau,VROUWEN,false
+Ashley Van Driessche,VROUWEN,false
+Elien Van Driessche,VROUWEN,false
+Marthe Van Hecke,VROUWEN,false
+Paulien Van Hecke,VROUWEN,false
+Emma Van Malderen,VROUWEN,true
+Anke Van Puyvelde,VROUWEN,false
+Ilona Van Zande,VROUWEN,false
+Enna Vande Meirssche,VROUWEN,false
+Lise Verspeurt,VROUWEN,false
+Caitlin Vervaet,VROUWEN,false
+Lieve Veyt,VROUWEN,false
+Nele Veyt,VROUWEN,false
+Valérie Withofs,VROUWEN,false
