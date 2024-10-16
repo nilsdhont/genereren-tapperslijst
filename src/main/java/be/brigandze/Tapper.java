@@ -109,6 +109,7 @@ public class Tapper implements Comparable<Tapper>{
     public String[] createCVSLine(List<Shift> listForTapper) {
         List<String> list = new ArrayList<>();
         list.add(naam);
+        list.add(ploeg.name());
         list.add(String.valueOf(aantalTrainingenMaandagDinsdag));
         list.add(String.valueOf(aantalTrainingenDonderdag));
         list.add(String.valueOf(aantalTrainingenJeugd));
