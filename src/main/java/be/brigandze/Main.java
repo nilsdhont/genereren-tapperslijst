@@ -52,6 +52,9 @@ public class Main {
         if (date.isAfter(startWinterStop) && date.isBefore(endWinterStop)) {
             return; // No shifts during winterstop
         }
+        if(shiften.stream().anyMatch(shift -> shift.startDateTime().toLocalDate().equals(date))){
+            return; // there is already a shift for this date
+        }
 
         switch (date.getDayOfWeek()) {
             case MONDAY -> shiften.add(
@@ -130,7 +133,7 @@ public class Main {
         List<Tapper> seniorTappers;
         List<Tapper> touchTappers = List.of();
 
-        if (getLeastAmountOfMatchen(TOUCH) < getLeastAmountOfMatchen(ploeg)) {
+        if (getLeastAmountOfMatchen(TOUCH) <= getLeastAmountOfMatchen(ploeg)) {
             seniorTappers =
                     IntStream.range(0, 4).mapToObj(i -> findTapperForMatch(ploeg)).toList();
             touchTappers =
