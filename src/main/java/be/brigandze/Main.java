@@ -60,11 +60,11 @@ public class Main {
             case MONDAY -> shiften.add(
                     createShiftForTrainingMaandagDinsdag(date, VROUWEN)); // Training vrouwen
             case TUESDAY -> {
-                shiften.add(createJeugdShiftWeekdag(date, false));
+                shiften.add(createJeugdShiftWeekdag(date));
                 shiften.add(createShiftForTrainingMaandagDinsdag(date, MANNEN)); // Training mannen
             }
             case THURSDAY -> {
-                shiften.add(createJeugdShiftWeekdag(date, false));
+                shiften.add(createJeugdShiftWeekdag(date));
                 shiften.add(createShiftForTrainingDonderdag(date)); // Training mannen/vrouwen7
 
             }
@@ -106,12 +106,12 @@ public class Main {
                 "Training " + ploeg.toString().toLowerCase());
     }
 
-    private static Shift createJeugdShiftWeekdag(LocalDate date, boolean tappers) {
+    private static Shift createJeugdShiftWeekdag(LocalDate date) {
         return new Shift(
                 date.atTime(18, 0),
                 LocalTime.of(19, 30),
                 date.getDayOfWeek(),
-                tappers ? List.of(findTapperForTrainingJeugd(), findTapperForTrainingJeugd()) : List.of(),
+                 List.of(),
                 "Training jeugd");
     }
 
@@ -442,10 +442,10 @@ public class Main {
         matchen.put(LocalDate.of(2025, 1, 25), VROUWEN); // RC9
 
         matchenJeugd = new HashMap<>();
-        matchenJeugd.put(LocalDate.of(2024, 9, 21), TORNOOI);
-        matchenJeugd.put(LocalDate.of(2024, 9, 21), TORNOOI);
-        matchenJeugd.put(LocalDate.of(2024, 10, 12), TORNOOI);
-        matchenJeugd.put(LocalDate.of(2024, 11, 21), TORNOOI);
+        matchenJeugd.put(LocalDate.of(2024, 12, 7), TORNOOI);
+        matchenJeugd.put(LocalDate.of(2025, 2, 8), TORNOOI);
+
+        matchenJeugd.put(LocalDate.of(2025, 5, 10), TORNOOI); //TODO club activiteit bij matchen tellen
 //
 //    matchenJeugd.put(LocalDate.of(2023, 9, 9), U14TO);
 //    matchenJeugd.put(LocalDate.of(2023, 9, 30), U14);
